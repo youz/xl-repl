@@ -153,7 +153,7 @@
 	(with-output-to-buffer ((selected-buffer) (point-max))
 	  (setq forms (nreverse forms))
 	  (iflet com (and (keywordp (car forms)) (getf *commands* (car forms)))
-	       (apply com (cdr forms))
+		 (apply com (cdr forms))
 	    (dolist (expr (nreverse forms))
 	      (setq - expr)
 	      (let ((results (save-excursion
@@ -186,6 +186,32 @@
   (interactive)
   (delete-region (point-min) (point-max))
   (show-prompt))
+
+(defmacro define-repl-command (name args &body body)
+  (let ((kw (intern (string name) :keyword)))
+    `(setf (getf *commands* ,kw)
+	   (lambda ,args ,@body))))
+(setf (get 'define-repl-command 'ed:lisp-indent-hook) 2)
+
+
+;;; repl command
+(define-repl-command require (name)
+  (let ((*load-path* (cons (default-directory) *load-path*)))
+    (eval-and-print (format nil "(require \"~A\")" name))))
+
+(define-repl-command load (name)
+  (let ((*load-path* (cons (default-directory) *load-path*)))
+    (eval-and-print (format nil "(load-library \"~A\")" name))))
+
+(define-repl-command dir (&optional wild)
+  (let* ((dir (default-directory))
+	 (files (directory dir :wild (or wild "*"))))
+    (format t "[~A]~%~{~A~%~}~%" dir files)))
+
+(define-repl-command cd (dir)
+  (let ((path (merge-pathnames dir (default-directory))))
+    (set-default-directory dir)
+    (format t "[~A]~%~%" path)))
 
 
 (defun ed::lisp-repl-mode ()
