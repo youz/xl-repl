@@ -28,11 +28,11 @@
 
 
 (in-package :editor)
-(export '(lisp-repl-mode start-repl))
+(export '(start-repl))
 
 (in-package :lisp)
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (export '(** *** // /// ++ +++))) ; ‚Ô‚Â‚©‚él‚¢‚»‚¤
+  (export '(** *** // /// ++ +++)))
 
 (defpackage :repl
   (:use :lisp :editor))
@@ -126,6 +126,7 @@
       (unless (<= from p (1- to))
 	(delete-char-or-selection n)))))
 
+
 (defun get-input ()
   (multiple-value-bind (from to) (previous-prompt-point)
     (save-excursion
@@ -214,6 +215,7 @@
     (format t "[~A]~%~%" path)))
 
 
+;;; major mode
 (defun ed::lisp-repl-mode ()
   (interactive)
   (lisp-mode)
@@ -230,6 +232,8 @@
   (setq *buffer-package* *startup-package*)
   (run-hooks '*startup-hook*))
 
+
+;;; launcher
 (defun ed::start-repl ()
   (interactive)
   (let ((buf (get-buffer-create *buffer-name*)))
