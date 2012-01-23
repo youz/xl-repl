@@ -28,7 +28,7 @@
 
 
 (in-package :editor)
-(export '(start-repl))
+(export '(start-repl lisp-repl-mode))
 
 (in-package :lisp)
 (eval-when (:compile-toplevel :load-toplevel :execute)
@@ -45,7 +45,7 @@
 	  *error-style*
 	  *startup-hook*))
 
-(defvar *buffer-name* "*xl-repl*")
+(defvar *buffer-name* "*REPL*")
 (defvar *prompt* "%p>")
 (defvar *prompt-style* '(:foreground 12 :bold t))
 (defvar *error-style* '(:foreground 1))
@@ -230,6 +230,7 @@
   (mapc #'make-local-variable
 	'(* ** *** / // /// + ++ +++ -))
   (setq *buffer-package* *startup-package*)
+  (set-buffer-fold-type-window)
   (run-hooks '*startup-hook*))
 
 
