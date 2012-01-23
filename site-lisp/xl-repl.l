@@ -81,7 +81,7 @@
     (with-input-from-string (is *prompt*)
       (whilet c (read-char is nil nil)
 	(princ
-         (if (char= c #\%)
+	 (if (char= c #\%)
 	     (let ((post (read-char is nil nil)))
 	       (if (null post) c
 		 (case (char-downcase post)
@@ -154,7 +154,7 @@
 	(with-output-to-buffer ((selected-buffer) (point-max))
 	  (setq forms (nreverse forms))
 	  (iflet com (and (keywordp (car forms)) (getf *commands* (car forms)))
-		 (apply com (cdr forms))
+	    (apply com (cdr forms))
 	    (dolist (expr (nreverse forms))
 	      (setq - expr)
 	      (let ((results (save-excursion
@@ -245,3 +245,10 @@
     (insert ";;; xyzzy lisp REPL\n")
     (show-prompt)))
 
+
+;;; for edit
+(setf
+ (get 'iflet #0='ed:lisp-indent-hook) 1
+ (get 'whenlet #0#) 2
+ (get 'whilet #0#) 2
+ (get 'define-repl-command #0#) 2)
