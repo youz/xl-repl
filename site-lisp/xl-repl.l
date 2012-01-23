@@ -63,6 +63,7 @@
 
 (defvar-local *input-history* nil)
 
+;;; utilities
 (defmacro iflet (var test then else)
   `(let ((,var ,test)) (if ,var ,then ,else)))
 
@@ -74,6 +75,14 @@
 
 (defmacro nth-value (n form)
   `(nth ,n (multiple-value-list ,form)))
+
+(defun read-all-from-string (str)
+  (let ((forms nil)
+	(eos '#:eos))
+    (with-input-from-string (is str)
+      (do ((s #0=(read is nil eos) #0#))
+	  ((eq s eos) (nreverse forms))
+	(push s forms)))))
 
 
 (defun format-prompt ()
@@ -146,13 +155,8 @@
   (handler-case
       (let ((*package* (or (find-package *buffer-package*)
 			   (find-package "user")))
-	    (forms nil))
-	(with-input-from-string (is input)
-	  (do ((s #0=(read is nil #1='#:eos) #0#))
-	      ((eq s #1#))
-	    (push s forms)))
+	    (forms (read-all-from-string input)))
 	(with-output-to-buffer ((selected-buffer) (point-max))
-	  (setq forms (nreverse forms))
 	  (iflet com (and (keywordp (car forms)) (getf *commands* (car forms)))
 	    (apply com (cdr forms))
 	    (dolist (expr (nreverse forms))
