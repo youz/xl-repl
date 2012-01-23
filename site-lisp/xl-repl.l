@@ -192,14 +192,14 @@
   (delete-region (point-min) (point-max))
   (show-prompt))
 
-(defmacro define-repl-command (name args &body body)
-  (let ((kw (intern (string name) :keyword)))
-    `(setf (getf *commands* ,kw)
-	   (lambda ,args ,@body))))
-(setf (get 'define-repl-command 'ed:lisp-indent-hook) 2)
-
 
 ;;; repl command
+(defmacro define-repl-command (name args &body body)
+  (let ((kw (intern (string name) :keyword)))
+    `(progn
+       (setf (getf *commands* ,kw) (lambda ,args ,@body))
+       ,kw)))
+
 (define-repl-command require (name)
   (let ((*load-path* (cons (default-directory) *load-path*)))
     (eval-and-print (format nil "(require \"~A\")" name))))
