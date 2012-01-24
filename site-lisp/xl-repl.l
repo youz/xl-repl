@@ -218,6 +218,21 @@
     (set-default-directory dir)
     (format t "[~A]~%~%" path)))
 
+(define-repl-command mkpkg (name &rest options)
+  (let ((pkg (find-package name)))
+    (when pkg
+      (format t "~S already exists.~%~%" pkg))
+    (let ((p (or pkg (apply #'make-package name options))))
+      (in-package p)
+      (setq *buffer-package* (package-name p))
+      (format t "~S~%~%" p))))
+
+(define-repl-command rmpkg (name)
+  (when (string-match "lisp\\|ed\\|editor\\|user\\|repl" (string name))
+    (error "don't delete package: ~A" name))
+  (format t "~S~%~%" (delete-package name))
+  (setq *buffer-package* (package-name *package*)))
+
 
 ;;; major mode
 (defun ed::lisp-repl-mode ()
@@ -231,8 +246,7 @@
     (make-local-variable 'auto-save)
     (setq need-not-save t
 	  auto-save nil))
-  (mapc #'make-local-variable
-	'(* ** *** / // /// + ++ +++ -))
+  (mapc #'make-local-variable '(* ** *** / // /// + ++ +++ -))
   (setq *buffer-package* *startup-package*)
   (set-buffer-fold-type-window)
   (run-hooks '*startup-hook*))
