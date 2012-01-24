@@ -152,28 +152,28 @@
       (<= (point) from))))
 
 (defun eval-and-print (input)
-  (handler-case
-      (let ((*package* (or (find-package *buffer-package*)
-			   (find-package "user")))
-	    (forms (read-all-from-string input)))
-	(with-output-to-buffer ((selected-buffer) (point-max))
-	  (iflet com (and (keywordp (car forms)) (getf *commands* (car forms)))
-	    (apply com (cdr forms))
-	    (dolist (expr (nreverse forms))
-	      (setq - expr)
-	      (let ((results (save-excursion
-			       (multiple-value-list (eval expr)))))
-		(setq *** ** ** * * (car results)
-		      +++ ++ ++ + + expr
-		      /// // // / / (if (cdr results) results *)
-		      *buffer-package* (package-name *package*))
-		(format t "~{~S~^ ;~%~}~%~%" results))))))
-    (error (c)
-      (let ((start (point-max)))
-	(with-output-to-buffer ((selected-buffer) start)
-	  (format t "~A~%~%" (si:*condition-string c)))
-	(apply #'set-text-attribute start (- (point-max) 2) 'error
-	       *error-style*)))))
+  (let ((*package* (or (find-package *buffer-package*)
+		       (find-package "user"))))
+    (handler-case
+	(let ((forms (read-all-from-string input)))
+	  (with-output-to-buffer ((selected-buffer) (point-max))
+	    (iflet com (and (keywordp (car forms)) (getf *commands* (car forms)))
+	      (apply com (cdr forms))
+	      (dolist (expr forms)
+		(setq - expr)
+		(let ((results (save-excursion
+				 (multiple-value-list (eval expr)))))
+		  (setq *** ** ** * * (car results)
+			+++ ++ ++ + + expr
+			/// // // / / (if (cdr results) results *)
+			*buffer-package* (package-name *package*))
+		  (format t "~{~S~^ ;~%~}~%~%" results))))))
+      (error (c)
+	(let ((start (point-max)))
+	  (with-output-to-buffer ((selected-buffer) start)
+	    (format t "~A~%~%" (si:*condition-string c)))
+	  (apply #'set-text-attribute start (- (point-max) 2) 'error
+		 *error-style*))))))
 
 (defun newline-or-eval-input ()
   (interactive)
