@@ -300,6 +300,18 @@
   (when (boundp sym)
     (show-variable-document sym)))
 
+(defun list-symbols (pkg &optional pat)
+  (let ((syms nil))
+    (do-symbols (s pkg)
+      (when (and (eq (symbol-package s) pkg)
+		 (or (boundp s) (fboundp s))
+		 (or (null pat) (string-match (string pat) (symbol-name s))))
+	(push s syms)))
+    (sort syms #'string< :key #'symbol-name)))
+
+(defun repl.command::ls (&optional pat (pkg *package*))
+  (format t "~{~S~%~}" (list-symbols (find-package pkg))))
+
 
 ;;; major mode
 (defun ed::lisp-repl-mode ()
