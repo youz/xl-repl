@@ -203,27 +203,23 @@
 
 
 ;;; repl command
-(defmacro define-repl-command (name args &body body)
-  (let ((cname (intern (string name) :repl.command)))
-    `(defun ,cname ,args ,@body)))
-
-(define-repl-command require (name)
+(defun repl.command::require (name)
   "default-directoryを*load-path*に含めて(require name)を評価"
   (let ((*load-path* (cons (default-directory) *load-path*)))
     (princ (require name))))
 
-(define-repl-command load (name)
+(defun repl.command::load (name)
   "default-directoryを*load-path*に含めて(load-library name)を評価"
   (let ((*load-path* (cons (default-directory) *load-path*)))
     (princ (load-library name))))
 
-(define-repl-command dir (&optional wildcard)
+(defun repl.command::dir (&optional wildcard)
   "default-directoryのファイルを列挙"
   (let* ((dir (default-directory))
 	 (files (directory dir :wild (or wildcard "*"))))
     (format t "[~A]~%~{~A~%~}" dir files)))
 
-(define-repl-command cd (&optional dir)
+(defun repl.command::cd (&optional dir)
   "default-directoryをdirへ移動 (dir省略時はdefault-directoryを表示)"
   (if dir
       (let ((path (merge-pathnames dir (default-directory))))
@@ -231,13 +227,13 @@
 	  (princ path)))
     (princ (default-directory))))
 
-(define-repl-command inpkg (name)
+(defun repl.command::inpkg (name)
   "(in-package name)を評価"
   (let ((pkg (in-package name)))
     (princ pkg)
     (setq *buffer-package* (package-name pkg))))
 
-(define-repl-command mkpkg (name &rest options)
+(defun repl.command::mkpkg (name &rest options)
   "(defpackage name [options])を評価し、*package*を作成したパッケージに変更"
   (let ((pkg (find-package name)))
     (when pkg
@@ -247,7 +243,7 @@
       (setq *buffer-package* (package-name p))
       (princ p))))
 
-(define-repl-command rmpkg (name)
+(defun repl.command::rmpkg (name)
   "(delete-apckage name)を評価"
   (let ((pkg (find-package name)))
     (unless pkg
@@ -259,7 +255,7 @@
     (when (delete-package name)
       (format t "パッケージを削除しました: ~A" name))))
 
-(define-repl-command help (&optional pattern)
+(defun repl.command::help (&optional pattern)
   "REPLコマンドの説明を表示"
   (let ((coms nil)
 	(pat (string pattern)))
@@ -273,6 +269,7 @@
 	(format t ":~A ~@[~A~]~%~4T; ~A~%" com args
 		(or (documentation com 'function)
 		    "not documentated"))))))
+
 
 ;;; major mode
 (defun ed::lisp-repl-mode ()
@@ -308,5 +305,4 @@
 (setf
  (get 'iflet #0='ed:lisp-indent-hook) 1
  (get 'whenlet #0#) 2
- (get 'whilet #0#) 2
- (get 'define-repl-command #0#) 2)
+ (get 'whilet #0#) 2)
