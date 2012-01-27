@@ -37,6 +37,9 @@
 (defpackage :repl
   (:use :lisp :editor))
 
+(defpackage :repl.command)
+(unuse-package :lisp :repl.command)
+
 (in-package :repl)
 (export '(*buffer-name*
 	  *keymap*
@@ -51,7 +54,6 @@
 (defvar *error-style* '(:foreground 1))
 (defvar *startup-hook* nil)
 (defvar *startup-package* "user")
-(defvar *commands* nil)
 
 (defparameter *keymap* (copy-keymap ed::*lisp-mode-map*))
 (define-key *keymap* #\RET 'newline-or-eval-input)
@@ -151,14 +153,21 @@
 	(skip-chars-backward " \t\n"))
       (<= (point) from))))
 
+(defun repl-command-p (x)
+  (whenlet s (and (keywordp x)
+		  (find-symbol (symbol-name x) :repl.command))
+    (and (fboundp s) s)))
+
 (defun eval-and-print (input)
   (let ((*package* (or (find-package *buffer-package*)
 		       (find-package "user"))))
     (handler-case
 	(let ((forms (read-all-from-string input)))
 	  (with-output-to-buffer ((selected-buffer) (point-max))
-	    (iflet com (and (keywordp (car forms)) (getf *commands* (car forms)))
-	      (apply com (cdr forms))
+	    (iflet com (repl-command-p (car forms))
+	      (progn
+		(apply com (cdr forms))
+		(format t "~&~%"))
 	      (dolist (expr forms)
 		(setq - expr)
 		(let ((results (save-excursion
@@ -195,44 +204,75 @@
 
 ;;; repl command
 (defmacro define-repl-command (name args &body body)
-  (let ((kw (intern (string name) :keyword)))
-    `(progn
-       (setf (getf *commands* ,kw) (lambda ,args ,@body))
-       ,kw)))
+  (let ((cname (intern (string name) :repl.command)))
+    `(defun ,cname ,args ,@body)))
 
 (define-repl-command require (name)
+  "default-directoryを*load-path*に含めて(require name)を評価"
   (let ((*load-path* (cons (default-directory) *load-path*)))
-    (eval-and-print (format nil "(require \"~A\")" name))))
+    (princ (require name))))
 
 (define-repl-command load (name)
+  "default-directoryを*load-path*に含めて(load-library name)を評価"
   (let ((*load-path* (cons (default-directory) *load-path*)))
-    (eval-and-print (format nil "(load-library \"~A\")" name))))
+    (princ (load-library name))))
 
-(define-repl-command dir (&optional wild)
+(define-repl-command dir (&optional wildcard)
+  "default-directoryのファイルを列挙"
   (let* ((dir (default-directory))
-	 (files (directory dir :wild (or wild "*"))))
-    (format t "[~A]~%~{~A~%~}~%" dir files)))
+	 (files (directory dir :wild (or wildcard "*"))))
+    (format t "[~A]~%~{~A~%~}" dir files)))
 
-(define-repl-command cd (dir)
-  (let ((path (merge-pathnames dir (default-directory))))
-    (set-default-directory dir)
-    (format t "[~A]~%~%" path)))
+(define-repl-command cd (&optional dir)
+  "default-directoryをdirへ移動 (dir省略時はdefault-directoryを表示)"
+  (if dir
+      (let ((path (merge-pathnames dir (default-directory))))
+	(when (set-default-directory path)
+	  (princ path)))
+    (princ (default-directory))))
+
+(define-repl-command inpkg (name)
+  "(in-package name)を評価"
+  (let ((pkg (in-package name)))
+    (princ pkg)
+    (setq *buffer-package* (package-name pkg))))
 
 (define-repl-command mkpkg (name &rest options)
+  "(defpackage name [options])を評価し、*package*を作成したパッケージに変更"
   (let ((pkg (find-package name)))
     (when pkg
-      (format t "~S already exists.~%~%" pkg))
+      (format t "既存のパッケージです~%" pkg))
     (let ((p (or pkg (apply #'make-package name options))))
       (in-package p)
       (setq *buffer-package* (package-name p))
-      (format t "~S~%~%" p))))
+      (princ p))))
 
 (define-repl-command rmpkg (name)
-  (when (string-match "lisp\\|ed\\|editor\\|user\\|repl" (string name))
-    (error "don't delete package: ~A" name))
-  (format t "~S~%~%" (delete-package name))
-  (setq *buffer-package* (package-name *package*)))
+  "(delete-apckage name)を評価"
+  (let ((pkg (find-package name)))
+    (unless pkg
+      (error "パッケージが存在しません: ~S" name))
+    (when (string-match "si\\|lisp\\|editor\\|user\\|repl" (package-name pkg))
+      (error "削除すべきではありません: ~S" pkg))
+    (when (eq pkg *package*)
+      (error "カレントパッケージです: ~S" pkg))
+    (when (delete-package name)
+      (format t "パッケージを削除しました: ~A" name))))
 
+(define-repl-command help (&optional pattern)
+  "REPLコマンドの説明を表示"
+  (let ((coms nil)
+	(pat (string pattern)))
+    (do-symbols (s :repl.command)
+      (when (fboundp s)
+	(let ((name (symbol-name s)))
+	  (when (or (null pattern) (string-match pat name))
+	    (push s coms)))))
+    (dolist (com (sort coms #'string< :key #'symbol-name))
+      (let ((args (cadr (si:closure-body (symbol-function com)))))
+	(format t ":~A ~@[~A~]~%~4T; ~A~%" com args
+		(or (documentation com 'function)
+		    "not documentated"))))))
 
 ;;; major mode
 (defun ed::lisp-repl-mode ()
