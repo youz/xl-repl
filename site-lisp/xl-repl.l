@@ -229,6 +229,15 @@
 	  (princ path)))
     (princ (default-directory))))
 
+;; package系
+(defun repl.command::lspkg (&optional pattern)
+  "パッケージ名を列挙"
+  (let ((pkgs (mapcar #'package-name (list-all-packages))))
+    (when pattern
+      (let ((re (string pattern)))
+	(setq pkgs (remove-if-not #'(lambda (p) (string-match re p)) pkgs))))
+    (format t "~{~A~%~}" (sort pkgs #'string<))))
+
 (defun repl.command::inpkg (name)
   "(in-package 'name)を評価"
   (let ((pkg (in-package name)))
@@ -257,6 +266,20 @@
     (when (delete-package name)
       (format t "パッケージを削除しました: ~A" name))))
 
+(defun list-symbols (pkg &optional pat)
+  (let ((syms nil))
+    (do-symbols (s pkg)
+      (when (and (eq (symbol-package s) pkg)
+		 (or (boundp s) (fboundp s))
+		 (or (null pat) (string-match (string pat) (symbol-name s))))
+	(push s syms)))
+    (sort syms #'string< :key #'symbol-name)))
+
+(defun repl.command::ls (&optional pat (pkg *package*))
+  "パッケージ内の変数/定数/関数シンボルを列挙"
+  (format t "~{~S~%~}" (list-symbols (find-package pkg))))
+
+;; help系
 (defun repl.command::help (&optional pattern)
   "REPLコマンドの説明を表示"
   (let ((coms nil)
@@ -302,19 +325,6 @@
     (show-function-document sym))
   (when (boundp sym)
     (show-variable-document sym)))
-
-(defun list-symbols (pkg &optional pat)
-  (let ((syms nil))
-    (do-symbols (s pkg)
-      (when (and (eq (symbol-package s) pkg)
-		 (or (boundp s) (fboundp s))
-		 (or (null pat) (string-match (string pat) (symbol-name s))))
-	(push s syms)))
-    (sort syms #'string< :key #'symbol-name)))
-
-(defun repl.command::ls (&optional pat (pkg *package*))
-  "パッケージ内の変数/定数/関数シンボルを列挙"
-  (format t "~{~S~%~}" (list-symbols (find-package pkg))))
 
 
 ;;; major mode
