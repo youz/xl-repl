@@ -277,7 +277,7 @@
 
 (defun repl.command::ls (&optional pat (pkg *package*))
   "パッケージ内の変数/定数/関数シンボルを列挙"
-  (format t "~{~S~%~}" (list-symbols (find-package pkg))))
+  (format t "~{~S~%~}" (list-symbols (find-package pkg) pat)))
 
 ;; help系
 (defun repl.command::help (&optional pattern)
