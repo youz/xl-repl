@@ -271,6 +271,36 @@
 		    "not documented"))))))
 
 
+(defun show-function-document (funcsym)
+  (whenlet fun (symbol-function funcsym)
+    (let* ((builtin? (si:*builtin-function-p fun))
+	   (macro? (not (null (macro-function funcsym))))
+	   (doc (or (documentation funcsym 'function)
+		   "not documented"))
+	   (arg (cond (builtin? (get funcsym 'si::builtin-function-argument))
+		      (macro? (cadr fun))
+		      (t (cadr (si:closure-body fun))))))
+      (format t "<~A> ~S ~A~%~4T; ~A~%"
+	      (cond ((special-form-p funcsym) "Special Operator")
+		    ((macro-function funcsym) "Macro")
+		    (t (if builtin? "Builtin Function" "Function")))
+	      funcsym (or arg "()") (remove #\LFD doc)))))
+
+(defun show-variable-document (varsym)
+  (when (boundp varsym)
+    (let ((doc (or (documentation varsym 'variable)
+		   "not documented"))
+	  (const? (constantp varsym)))
+      (format t "<~:[Special~;Constant~] Variable> ~S~%~4T; ~A~%"
+	      const? varsym doc))))
+
+(defun repl.command::desc (sym)
+  (when (fboundp sym)
+    (show-function-document sym))
+  (when (boundp sym)
+    (show-variable-document sym)))
+
+
 ;;; major mode
 (defun ed::lisp-repl-mode ()
   (interactive)
