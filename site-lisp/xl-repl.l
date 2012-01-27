@@ -54,6 +54,7 @@
 (defvar *error-style* '(:foreground 1))
 (defvar *startup-hook* nil)
 (defvar *startup-package* "user")
+(defvar *locked-packages* '(:system :lisp :editor :user :repl :repl.command))
 
 (defparameter *keymap* (copy-keymap ed::*lisp-mode-map*))
 (define-key *keymap* #\RET 'newline-or-eval-input)
@@ -248,7 +249,7 @@
   (let ((pkg (find-package name)))
     (unless pkg
       (error "パッケージが存在しません: ~S" name))
-    (when (string-match "si\\|lisp\\|editor\\|user\\|repl" (package-name pkg))
+    (when (find (package-name pkg) *locked-packages* :test 'string=)
       (error "削除すべきではありません: ~S" pkg))
     (when (eq pkg *package*)
       (error "カレントパッケージです: ~S" pkg))
