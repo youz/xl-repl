@@ -286,7 +286,7 @@
 	      (cond ((special-form-p funcsym) "Special Operator")
 		    ((macro-function funcsym) "Macro")
 		    (t (if builtin? "Builtin Function" "Function")))
-	      funcsym (or arg "()") (remove #\LFD doc)))))
+	      funcsym (or arg "()") (substitute-string doc "\n" "\n    ;")))))
 
 (defun show-variable-document (varsym)
   (when (boundp varsym)
