@@ -206,12 +206,12 @@
 
 ;;; repl command
 (defun repl.command::require (name)
-  "default-directoryを*load-path*に含めて(require name)を評価"
+  "default-directoryを*load-path*に含めて(require 'name)を評価"
   (let ((*load-path* (cons (default-directory) *load-path*)))
     (princ (require name))))
 
 (defun repl.command::load (name)
-  "default-directoryを*load-path*に含めて(load-library name)を評価"
+  "default-directoryを*load-path*に含めて(load-library 'name)を評価"
   (let ((*load-path* (cons (default-directory) *load-path*)))
     (princ (load-library name))))
 
@@ -230,13 +230,13 @@
     (princ (default-directory))))
 
 (defun repl.command::inpkg (name)
-  "(in-package name)を評価"
+  "(in-package 'name)を評価"
   (let ((pkg (in-package name)))
     (princ pkg)
     (setq *buffer-package* (package-name pkg))))
 
 (defun repl.command::mkpkg (name &rest options)
-  "(defpackage name [options])を評価し、*package*を作成したパッケージに変更"
+  "(defpackage 'name [options])を評価し、*package*を作成したパッケージに変更"
   (let ((pkg (find-package name)))
     (when pkg
       (format t "既存のパッケージです~%" pkg))
@@ -246,7 +246,7 @@
       (princ p))))
 
 (defun repl.command::rmpkg (name)
-  "(delete-apckage name)を評価"
+  "(delete-apckage 'name)を評価"
   (let ((pkg (find-package name)))
     (unless pkg
       (error "パッケージが存在しません: ~S" name))
@@ -297,7 +297,7 @@
 	      const? varsym doc))))
 
 (defun repl.command::desc (sym)
-  "関数または変数のdocstringを表示"
+  "変数/定数/関数のdocstringを表示"
   (when (fboundp sym)
     (show-function-document sym))
   (when (boundp sym)
