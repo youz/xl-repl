@@ -295,6 +295,7 @@
 	      const? varsym doc))))
 
 (defun repl.command::desc (sym)
+  "関数または変数のdocstringを表示"
   (when (fboundp sym)
     (show-function-document sym))
   (when (boundp sym)
@@ -310,6 +311,7 @@
     (sort syms #'string< :key #'symbol-name)))
 
 (defun repl.command::ls (&optional pat (pkg *package*))
+  "パッケージ内の変数/定数/関数シンボルを列挙"
   (format t "~{~S~%~}" (list-symbols (find-package pkg))))
 
 
