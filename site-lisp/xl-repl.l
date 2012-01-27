@@ -268,7 +268,7 @@
       (let ((args (cadr (si:closure-body (symbol-function com)))))
 	(format t ":~A ~@[~A~]~%~4T; ~A~%" com args
 		(or (documentation com 'function)
-		    "not documentated"))))))
+		    "not documented"))))))
 
 
 ;;; major mode
