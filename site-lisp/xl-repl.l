@@ -38,7 +38,8 @@
   (:use :lisp :editor))
 
 (defpackage :repl.command)
-(unuse-package :lisp :repl.command)
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (unuse-package :lisp :repl.command))
 
 (in-package :repl)
 (export '(*buffer-name*
