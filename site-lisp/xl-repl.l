@@ -64,6 +64,8 @@
 (define-key *keymap* #\Delete 'repl-delete-char-or-selection)
 (define-key *keymap* #\C-d 'repl-delete-char-or-selection)
 (define-key *keymap* #\C-l 'clear-repl)
+(define-key *keymap* #\M-C-a 'beginning-of-input)
+(define-key *keymap* #\M-C-e 'end-of-input)
 
 (defvar-local *input-history* nil)
 
@@ -138,6 +140,15 @@
     (multiple-value-bind (from to) (previous-prompt-point)
       (unless (<= from p (1- to))
 	(delete-char-or-selection n)))))
+
+(defun beginning-of-input ()
+  (interactive)
+  (whenlet p (nth-value 1 (previous-prompt-point))
+    (goto-char p)))
+
+(defun end-of-input ()
+  (interactive)
+  (goto-char (or (next-prompt-point) (point-max))))
 
 
 (defun get-input ()
