@@ -318,26 +318,34 @@
 
 (defun show-function-document (funcsym)
   (whenlet fun (symbol-function funcsym)
-    (let* ((builtin? (si:*builtin-function-p fun))
+    (let* ((pkg (symbol-package funcsym))
+	   (name (symbol-name funcsym))
+	   (exported? (eq :external (nth-value 1 (find-symbol name pkg))))
+	   (builtin? (si:*builtin-function-p fun))
 	   (macro? (not (null (macro-function funcsym))))
 	   (doc (or (documentation funcsym 'function)
-		   "not documented"))
+		    "not documented"))
 	   (arg (cond (builtin? (get funcsym 'si::builtin-function-argument))
 		      (macro? (cadr fun))
 		      (t (cadr (si:closure-body fun))))))
-      (format t "<~A> ~S ~A~%~4T; ~A~%"
+      (format t "<~A> ~A:~:[:~;~]~A ~A~%~4T; ~A~%"
 	      (cond ((special-form-p funcsym) "Special Operator")
 		    ((macro-function funcsym) "Macro")
+		    ((commandp funcsym) "Command Function")
 		    (t (if builtin? "Builtin Function" "Function")))
-	      funcsym (or arg "()") (substitute-string doc "\n" "\n    ;")))))
+	      (package-name pkg) exported? name (or arg "()")
+	      (substitute-string doc "\n" "\n    ;")))))
 
 (defun show-variable-document (varsym)
   (when (boundp varsym)
-    (let ((doc (or (documentation varsym 'variable)
-		   "not documented"))
-	  (const? (constantp varsym)))
-      (format t "<~:[Special~;Constant~] Variable> ~S~%~4T; ~A~%"
-	      const? varsym doc))))
+    (let* ((pkg (symbol-package varsym))
+	   (name (symbol-name varsym))
+	   (exported? (eq :external (nth-value 1 (find-symbol name pkg))))
+	   (doc (or (documentation varsym 'variable)
+		    "not documented"))
+	   (const? (constantp varsym)))
+      (format t "<~:[Special~;Constant~] Variable> ~A:~:[:~;~]~A~%~4T; ~A~%"
+	      const? (package-name pkg) exported? name doc))))
 
 (defun repl.command::desc (sym)
   "ïœêî/íËêî/ä÷êîÇÃdocstringÇï\é¶"
