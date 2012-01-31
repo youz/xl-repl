@@ -162,7 +162,8 @@
 
 (defun eval-and-print (input)
   (let ((*package* (or (find-package *buffer-package*)
-		       (find-package "user"))))
+		       (find-package "user")))
+	(*standard-input* ed:*cooked-mode-input-stream*))
     (handler-case
 	(let ((forms (read-all-from-string input)))
 	  (with-output-to-buffer ((selected-buffer) (point-max))
