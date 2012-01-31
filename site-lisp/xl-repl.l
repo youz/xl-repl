@@ -247,7 +247,7 @@
 	(setq pkgs (remove-if-not #'(lambda (p) (string-match re p)) pkgs))))
     (format t "~{~A~%~}" (sort pkgs #'string<))))
 
-(defun repl.command::inpkg (name)
+(defun repl.command::package (name)
   "(in-package 'name)‚ð•]‰¿"
   (let ((pkg (in-package name)))
     (princ pkg)
