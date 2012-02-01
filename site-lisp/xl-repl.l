@@ -43,6 +43,7 @@
 
 (in-package :repl)
 (export '(*buffer-name*
+	  *greeting*
 	  *keymap*
 	  *prompt*
 	  *prompt-style*
@@ -50,6 +51,7 @@
 	  *startup-hook*))
 
 (defvar *buffer-name* "*REPL*")
+(defvar *greeting* ";;; xyzzy lisp REPL")
 (defvar *prompt* "%p>")
 (defvar *prompt-style* '(:foreground 12 :bold t))
 (defvar *error-style* '(:foreground 1))
@@ -229,6 +231,7 @@
 (defun clear-repl ()
   (interactive)
   (delete-region (point-min) (point-max))
+  (insert *greeting* #\LFD)
   (show-prompt))
 
 
@@ -389,8 +392,7 @@
     (when (eq buffer-mode 'ed::lisp-repl-mode)
       (return-from ed::start-repl))
     (ed::lisp-repl-mode)
-    (insert ";;; xyzzy lisp REPL\n")
-    (show-prompt)))
+    (clear-repl)))
 
 
 ;;; for edit
