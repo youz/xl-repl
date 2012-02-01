@@ -182,7 +182,9 @@
 (defun eval-and-print (input)
   (let ((*package* (or (find-package *buffer-package*)
 		       (find-package "user")))
-	(*standard-input* ed:*cooked-mode-input-stream*))
+	(*standard-input* ed:*cooked-mode-input-stream*)
+	(*error-output* (if si:*trace-on-error* (make-string-output-stream)
+			  *error-output*)))
     (handler-case
 	(let ((forms (read-all-from-string input)))
 	  (with-output-to-buffer ((selected-buffer) (point-max))
@@ -202,7 +204,12 @@
       (error (c)
 	(let ((start (point-max)))
 	  (with-output-to-buffer ((selected-buffer) start)
-	    (format t "~A~%~%" (si:*condition-string c)))
+	    (if si:*trace-on-error*
+		(let ((lines (nreverse (split-string (get-output-stream-string *error-output*) #\LFD))))
+		  (format t "~{~A~%~}~A~%~%"
+			  (nreverse (member-if (lambda (l) (string-match "^>CALL STACK +[0-9]+: (eval " l)) lines))
+			  (car lines)))
+	    (format t "~A~%~%" (si:*condition-string c))))
 	  (apply #'set-text-attribute start (- (point-max) 2) 'error
 		 *error-style*))))))
 
