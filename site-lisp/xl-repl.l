@@ -381,6 +381,9 @@
   (mapc #'make-local-variable '(* ** *** / // /// + ++ +++ -))
   (setq *buffer-package* *startup-package*)
   (set-buffer-fold-type-window)
+  (goto-char (point-max))
+  (insert *greeting* #\LFD)
+  (show-prompt)
   (run-hooks '*startup-hook*))
 
 
@@ -391,8 +394,7 @@
     (set-buffer buf)
     (when (eq buffer-mode 'ed::lisp-repl-mode)
       (return-from ed::start-repl))
-    (ed::lisp-repl-mode)
-    (clear-repl)))
+    (ed::lisp-repl-mode)))
 
 
 ;;; for edit
