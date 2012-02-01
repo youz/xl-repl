@@ -180,6 +180,13 @@
 	(when (= (length syms) 1)
 	  (car syms))))))
 
+(defun invoke-repl-command (com args)
+  (let ((out (member '> args :test #'string=)))
+    (if out
+	(let ((args (subseq args 0 (position '> args :test #'string=))))
+	  (set (cadr out) #0=(apply com args)))
+      #0#)))
+
 (defun eval-and-print (input)
   (let ((*package* (or (find-package *buffer-package*) (find-package "user")))
 	(*standard-input* ed:*cooked-mode-input-stream*)
@@ -190,7 +197,7 @@
 	  (with-output-to-buffer (replbuf (point-max))
 	    (iflet com (repl-command-p (car forms))
 	      (progn
-		(apply com (cdr forms))
+		(invoke-repl-command com (cdr forms))
 		(format t "~&~%"))
 	      (dolist (expr forms)
 		(save-excursion (set-buffer replbuf) (setq - expr))
