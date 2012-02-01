@@ -62,9 +62,6 @@ lisp-repl-mode for [xyzzy](http://www.jsdlab.co.jp/~kamei/)
     :require (name)
         ; default-directoryを*load-path*に含めて(require 'name)を評価
 
-    :rmpkg (name)
-        ; (delete-apckage 'name)を評価
-
 
 適当に省略してもOK.
 

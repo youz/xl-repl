@@ -294,18 +294,6 @@
       (setq *buffer-package* (package-name p))
       (princ p))))
 
-(defun repl.command::rmpkg (name)
-  "(delete-apckage 'name)を評価"
-  (let ((pkg (find-package name)))
-    (unless pkg
-      (error "パッケージが存在しません: ~S" name))
-    (when (find (package-name pkg) *locked-packages* :test 'string=)
-      (error "削除すべきではありません: ~S" pkg))
-    (when (eq pkg *package*)
-      (error "カレントパッケージです: ~S" pkg))
-    (when (delete-package name)
-      (format t "パッケージを削除しました: ~A" name))))
-
 (defun list-symbols (pkg &optional pat)
   (let ((syms nil))
     (do-symbols (s pkg)
