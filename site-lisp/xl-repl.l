@@ -249,8 +249,9 @@
 (defun repl.command::dir (&optional wildcard)
   "default-directoryのファイルを列挙"
   (let* ((dir (default-directory))
-	 (files (directory dir :wild (or wildcard "*"))))
-    (format t "[~A]~%~{~A~%~}" dir files)))
+	 (files (directory dir :wild (if wildcard (string wildcard) "*"))))
+    (format t "[~A]~%~{~A~%~}" dir files)
+    files))
 
 (defun repl.command::cd (&optional dir)
   "default-directoryをdirへ移動 (dir省略時はdefault-directoryを表示)"
@@ -263,17 +264,18 @@
 ;; package系
 (defun repl.command::lspkg (&optional pattern)
   "パッケージ名を列挙"
-  (let ((pkgs (mapcar #'package-name (list-all-packages))))
+  (let ((pkgs (sort (mapcar #'package-name (list-all-packages)) #'string<)))
     (when pattern
       (let ((re (string pattern)))
-	(setq pkgs (remove-if-not #'(lambda (p) (string-match re p)) pkgs))))
-    (format t "~{~A~%~}" (sort pkgs #'string<))))
+	(setq pkgs (delete-if-not #'(lambda (p) (string-match re p)) pkgs))))
+    (format t "~{~A~%~}" pkgs)
+    pkgs))
 
 (defun repl.command::package (name)
   "(in-package 'name)を評価"
   (let ((pkg (in-package name)))
-    (princ pkg)
-    (setq *buffer-package* (package-name pkg))))
+    (setq *buffer-package* (package-name pkg))
+    (princ pkg)))
 
 (defun repl.command::mkpkg (name &rest options)
   "(make-package 'name [options])を評価し、*package*を作成したパッケージに変更"
@@ -308,7 +310,9 @@
 
 (defun repl.command::ls (&optional pat (pkg *package*))
   "パッケージ内の変数/定数/関数シンボルを列挙"
-  (format t "~{~S~%~}" (list-symbols (find-package pkg) pat)))
+  (let ((syms (list-symbols (find-package pkg) pat)))
+    (format t "~{~S~%~}" syms)
+    syms))
 
 ;; help系
 (defun repl.command::help (&optional pattern)
