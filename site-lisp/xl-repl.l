@@ -276,7 +276,7 @@
     (setq *buffer-package* (package-name pkg))))
 
 (defun repl.command::mkpkg (name &rest options)
-  "(defpackage 'name [options])を評価し、*package*を作成したパッケージに変更"
+  "(make-package 'name [options])を評価し、*package*を作成したパッケージに変更"
   (let ((pkg (find-package name)))
     (when pkg
       (format t "既存のパッケージです~%" pkg))

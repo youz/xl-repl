@@ -54,7 +54,7 @@ lisp-repl-mode for [xyzzy](http://www.jsdlab.co.jp/~kamei/)
         ; パッケージ名を列挙
 
     :mkpkg (name &rest options)
-        ; (defpackage 'name [options])を評価し、*package*を作成したパッケージに変更
+        ; (make-package 'name [options])を評価し、*package*を作成したパッケージに変更
 
     :package (name)
         ; (in-package 'name)を評価
