@@ -20,12 +20,13 @@ lisp-repl-mode for [xyzzy](http://www.jsdlab.co.jp/~kamei/)
 
 ## Keymap
 
-`ed:*lisp-mode-map*` に以下のキーバインドを上書き
+`ed:*lisp-mode-map*` のコピーに以下のキーバインドを上書き
 
 - RET -- repl::newline-or-eval-input
 - C-l -- repl::clear-repl
 - M-C-a -- repl::beginning-of-input
 - M-C-e -- repl::end-of-input
+
 
 ## REPL Command
 
@@ -74,10 +75,12 @@ lisp-repl-mode for [xyzzy](http://www.jsdlab.co.jp/~kamei/)
     <Function> repl.command::package (name)
         ; (in-package 'name)を評価
 
+
 ## Author
 Yousuke Ushiki (<citrus.yubeshi@gmail.com>)
 
 [@Yubeshi](http://twitter.com/Yubeshi/)
+
 
 ## Copyright
 MIT License を適用しています。
