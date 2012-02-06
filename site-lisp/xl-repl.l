@@ -206,7 +206,7 @@
 		    (set-buffer replbuf)
 		    (setq *** ** ** * * (car results) +++ ++ ++ + + expr
 			  /// // // / / (if (cdr results) results *)
-			  *buffer-package* (package-name *package*))
+			  *buffer-package* (or (package-name *package*) "user"))
 		    (format t "~{~S~^ ;~%~}~%~%" results)))))))
       (error (c)
 	(set-buffer replbuf)
