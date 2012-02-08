@@ -181,7 +181,8 @@
 	  (car syms))))))
 
 (defun invoke-repl-command (com args)
-  (let ((out (member '> args :test #'string=)))
+  (let ((out (member-if #'(lambda (s) (and (symbolp s) (string= (symbol-name s) ">")))
+			args)))
     (if out
 	(let ((args (subseq args 0 (position '> args :test #'string=))))
 	  (set (cadr out) #0=(apply com args)))
