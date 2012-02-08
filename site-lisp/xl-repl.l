@@ -295,20 +295,32 @@
       (setq *buffer-package* (package-name p))
       (princ p))))
 
-(defun list-symbols (pkg &optional pat)
+(defun listup-symbols (pkg &key pattern (external t) (internal t))
   (let ((syms nil))
-    (do-symbols (s pkg)
-      (when (and (eq (symbol-package s) pkg)
-		 (or (boundp s) (fboundp s))
-		 (or (null pat) (string-match (string pat) (symbol-name s))))
-	(push s syms)))
-    (sort syms #'string< :key #'symbol-name)))
+    (with-package-iterator (iter (or pkg (list-all-packages)) :external :internal)
+      (loop
+	(multiple-value-bind (f sym stype spkg) (iter)
+	  (unless f (return))
+	  (when (and (or (null pkg) (eq pkg spkg))
+		     (or (boundp sym) (fboundp sym))
+		     (or (and external (eq stype :external))
+			 (and internal (eq stype :internal)))
+		     (or (null pattern) (string-match (string pattern) (symbol-name sym))))
+	    (push sym syms)))))
+    (format t "~{~S~%~}" (setq syms (sort syms #'string< :key #'symbol-name)))
+    syms))
 
 (defun repl.command::ls (&optional pat (pkg *package*))
   "パッケージ内の変数/定数/関数シンボルを列挙"
-  (let ((syms (list-symbols (find-package pkg) pat)))
-    (format t "~{~S~%~}" syms)
-    syms))
+  (listup-symbols (find-package pkg) :pattern pat))
+
+(defun repl.command::lsext (&optional pattern (pkg *package*))
+  "パッケージよりexportされている変数/定数/関数シンボルを列挙"
+  (listup-symbols (find-package pkg) :pattern pattern :internal nil))
+
+(defun repl.command::lsall (&optional pattern)
+  "全パッケージの変数/定数/関数シンボルを列挙"
+  (listup-symbols nil :pattern pattern))
 
 ;; help系
 (defun repl.command::help (&optional pattern)
