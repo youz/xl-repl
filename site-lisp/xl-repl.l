@@ -208,6 +208,7 @@
 (defun eval-and-print (input)
   (let ((*package* (or (find-package *buffer-package*) (find-package "user")))
 	(*standard-input* ed:*cooked-mode-input-stream*)
+	(*standard-output* *standard-output*)
 	(*error-output* (if si:*trace-on-error* (make-string-output-stream) *error-output*))
 	(replbuf (selected-buffer)))
     (save-input-history input)
