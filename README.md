@@ -36,8 +36,8 @@ lisp-repl-mode for [xyzzy](http://www.jsdlab.co.jp/~kamei/)
     :cd (&optional dir)
         ; default-directoryをdirへ移動 (dir省略時はdefault-directoryを表示)
 
-    :desc (sym)
-        ; 変数/定数/関数のdocstringを表示
+    :descible (symbol-or-package-name)
+        ; パッケージ/変数/定数/関数の説明を表示
 
     :dir (&optional wildcard)
         ; default-directoryのファイルを列挙

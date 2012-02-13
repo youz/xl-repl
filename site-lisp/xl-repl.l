@@ -380,9 +380,24 @@
 		(or (documentation com 'function)
 		    "not documented"))))))
 
+(defun show-package-description (pkgname)
+  (whenlet pkg (find-package pkgname)
+    (let ((name (package-name pkgname))
+	  (nicknames (package-nicknames pkg))
+	  (use-list (mapcar #'package-name (package-use-list pkg)))
+	  (used-by (mapcar #'package-name (package-used-by-list pkg)))
+	  (shadows (package-shadowing-symbols pkg))
+	  (exports (list-symbols pkg :external t :internal nil)))
+      (format t "<Package> ~A~%" name)
+      (format t "~@[Nicknames: ~{~A~^, ~}~%~]" nicknames)
+      (format t "~@[Use-list: ~{~A~^, ~}~%~]" use-list)
+      (format t "~@[Used-by-list: ~{~A~^, ~}~%~]" used-by)
+      (format t "~@[Shadows: ~{~A~^, ~}~%~]" shadows)
+      (format t "~@[Exports: ~{~A~^, ~}~%~]" exports))
+    (terpri)))
 
-(defun show-function-document (funcsym)
-  (whenlet fun (symbol-function funcsym)
+(defun show-function-description (funcsym)
+  (whenlet fun (and (fboundp funcsym) (symbol-function funcsym))
     (let* ((pkg (symbol-package funcsym))
 	   (name (symbol-name funcsym))
 	   (exported? (eq :external (nth-value 1 (find-symbol name pkg))))
@@ -393,15 +408,17 @@
 	   (arg (cond (builtin? (get funcsym 'si::builtin-function-argument))
 		      (macro? (cadr fun))
 		      (t (cadr (si:closure-body fun))))))
-      (format t "<~A> ~A:~:[:~;~]~A ~A~%~4T; ~A~%"
+      (format t "<~A> ~A:~:[:~;~]~A ~A~%  ; ~A~%"
 	      (cond ((special-form-p funcsym) "Special Operator")
 		    ((macro-function funcsym) "Macro")
 		    ((commandp funcsym) "Command Function")
 		    (t (if builtin? "Builtin Function" "Function")))
-	      (package-name pkg) exported? name (or arg "()")
+	      (package-name pkg) exported? name
+	      (let ((*package* pkg))
+		(if arg (format nil "~S" arg) "()"))
 	      (substitute-string doc "\n" "\n    ;")))))
 
-(defun show-variable-document (varsym)
+(defun show-variable-description (varsym)
   (when (boundp varsym)
     (let* ((pkg (symbol-package varsym))
 	   (name (symbol-name varsym))
@@ -409,15 +426,15 @@
 	   (doc (or (documentation varsym 'variable)
 		    "not documented"))
 	   (const? (constantp varsym)))
-      (format t "<~:[Special~;Constant~] Variable> ~A:~:[:~;~]~A~%~4T; ~A~%"
+      (format t "<~:[Special~;Constant~] Variable> ~A:~:[:~;~]~A~%  ; ~A~%"
 	      const? (package-name pkg) exported? name doc))))
 
-(defun repl.command::desc (sym)
-  "変数/定数/関数のdocstringを表示"
-  (when (fboundp sym)
-    (show-function-document sym))
-  (when (boundp sym)
-    (show-variable-document sym)))
+(defun repl.command::describe (#0=symbol-or-package-name)
+  "パッケージ/変数/定数/関数の説明を表示"
+  (show-package-description #0#)
+  (when (and (symbolp #0#) (not (keywordp #0#)))
+    (show-function-description #0#)
+    (show-variable-description #0#)))
 
 
 ;;; major mode
