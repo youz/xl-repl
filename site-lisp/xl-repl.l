@@ -67,8 +67,11 @@
 (define-key *keymap* #\C-l 'clear-repl)
 (define-key *keymap* #\M-C-a 'beginning-of-input)
 (define-key *keymap* #\M-C-e 'end-of-input)
+(define-key *keymap* #\C-p 'previous-input)
+(define-key *keymap* #\C-n 'next-input)
 
 (defvar-local *input-history* nil)
+(defvar-local *input-history-index* nil)
 
 ;;; utilities
 (defmacro iflet (var test then else)
@@ -142,6 +145,20 @@
       (unless (<= from p (1- to))
 	(delete-char-or-selection n)))))
 
+(defun clear-repl ()
+  (interactive)
+  (delete-region (point-min) (point-max))
+  (insert *greeting* #\LFD)
+  (show-prompt))
+
+(defun clear-current-input ()
+  (interactive)
+  (let ((p (nth-value 1 (previous-prompt-point))))
+    (if (or (not p) (next-prompt-point))
+	(show-prompt)
+      (delete-region p (point-max)))))
+
+
 (defun beginning-of-input ()
   (interactive)
   (whenlet p (nth-value 1 (previous-prompt-point))
@@ -150,7 +167,6 @@
 (defun end-of-input ()
   (interactive)
   (goto-char (or (next-prompt-point) (point-max))))
-
 
 (defun get-input ()
   (multiple-value-bind (from to) (previous-prompt-point)
@@ -193,6 +209,7 @@
 	(*standard-input* ed:*cooked-mode-input-stream*)
 	(*error-output* (if si:*trace-on-error* (make-string-output-stream) *error-output*))
 	(replbuf (selected-buffer)))
+    (save-input-history input)
     (handler-case
 	(let ((forms (read-all-from-string input)))
 	  (with-output-to-buffer (replbuf (point-max))
@@ -236,11 +253,29 @@
 	  (save-excursion (set-buffer buf) #0#)))
     (lisp-newline-and-indent)))
 
-(defun clear-repl ()
+
+;;; input history
+(defun save-input-history (input)
+  (when (or (null *input-history*)
+	    (string/= input (nth *input-history-index* *input-history*)))
+    (push input *input-history*)
+    (setq *input-history-index* 0)))
+
+(defun previous-input ()
   (interactive)
-  (delete-region (point-min) (point-max))
-  (insert *greeting* #\LFD)
-  (show-prompt))
+  (when *input-history*
+    (when (find *last-command* '(previous-input next-input))
+      (setq *input-history-index* (mod (1+ *input-history-index*) (length *input-history*))))
+    (clear-current-input)
+    (insert (nth *input-history-index* *input-history*))))
+
+(defun next-input ()
+  (interactive)
+  (when *input-history*
+    (when (find *last-command* '(previous-input next-input))
+      (setq *input-history-index* (mod (1- *input-history-index*) (length *input-history*))))
+    (clear-current-input)
+    (insert (nth *input-history-index* *input-history*))))
 
 
 ;;; repl command
