@@ -52,7 +52,7 @@ lisp-repl-mode for [xyzzy](http://www.jsdlab.co.jp/~kamei/)
         ; パッケージ内の変数/定数/関数シンボルを列挙
 
     :lspkg (&optional pattern)
-        ; パッケージ名を列挙
+        ; パッケージ名を列挙 (nicknamesがあれば括弧内に表示)
 
     :mkpkg (name &rest options)
         ; (make-package 'name [options])を評価し、*package*を作成したパッケージに変更
