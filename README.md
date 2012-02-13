@@ -22,11 +22,12 @@ lisp-repl-mode for [xyzzy](http://www.jsdlab.co.jp/~kamei/)
 
 `ed:*lisp-mode-map*` のコピーに以下のキーバインドを上書き
 
-- RET -- repl::newline-or-eval-input
-- C-l -- repl::clear-repl
-- M-C-a -- repl::beginning-of-input
-- M-C-e -- repl::end-of-input
-
+- RET -- repl::newline-or-eval-input  (入力した式を評価 / 書きかけならlisp-newline-and-indent)
+- C-l -- repl::clear-repl  (REPLバッファをクリア)
+- M-C-a -- repl::beginning-of-input  (入力中の式の先頭へ移動)
+- M-C-e -- repl::end-of-input  (入力中の式の最後へ移動)
+- C-p -- repl::previous-input  (入力履歴 - 戻る)
+- C-n -- repl::next-input  (入力履歴 - 進む)
 
 ## REPL Command
 
