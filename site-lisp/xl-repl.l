@@ -461,7 +461,8 @@
 ;;; launcher
 (defun ed::start-repl (&optional alt)
   (interactive "p")
-  (let* ((name (if alt (read-string "REPL Buffer Name: " :default *buffer-name*)))
+  (let* ((name (if alt (read-string "REPL Buffer Name: " :default *buffer-name*)
+		 *buffer-name*))
 	 (buf (get-buffer-create name)))
     (set-buffer buf)
     (when (eq buffer-mode 'ed::lisp-repl-mode)
