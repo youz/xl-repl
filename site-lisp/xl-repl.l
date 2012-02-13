@@ -308,12 +308,15 @@
 ;; package系
 (defun repl.command::lspkg (&optional pattern)
   "パッケージ名を列挙"
-  (let ((pkgs (sort (mapcar #'package-name (list-all-packages)) #'string<)))
+  (let ((pkgs (mapcar #'(lambda (p) (cons (package-name p) (package-nicknames p)))
+		      (list-all-packages))))
     (when pattern
-      (let ((re (string pattern)))
-	(setq pkgs (delete-if-not #'(lambda (p) (string-match re p)) pkgs))))
-    (format t "~{~A~%~}" pkgs)
-    pkgs))
+      (let* ((pat (string pattern))
+	     (pred (lambda (nm) (string-match pat nm))))
+	(setq pkgs (delete-if-not (lambda (p) (some pred p)) pkgs))))
+    (setq pkgs (sort pkgs #'string< :key #'car))
+    (dolist (pkg pkgs pkgs)
+      (format t "~A~@[  (~{~A~^ ~})~]~%" (car pkg) (cdr pkg)))))
 
 (defun repl.command::package (name)
   "(in-package 'name)を評価"
