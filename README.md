@@ -5,12 +5,18 @@ lisp-repl-mode for [xyzzy](http://www.jsdlab.co.jp/~kamei/)
 
 ## Install
 
-    git clone git://github.com/youz/xl-repl.git
+- NetInstallerをよりインストール
+ 
+    下記のURLのパッケージリストを登録し、パッケージ`*scrap*`よりインストールして下さい。
 
-### ~/.xyzzy
+    http://youz.github.com/xyzzy/package.l
 
-    (push "C:/path/to/xl-repl/site-lisp" *load-path*)
-    (require "xl-repl")
+- 手動インストール
+
+    `git clone git://github.com/youz/xl-repl.git` して `~/.xyzzy` に以下の設定を記述
+
+        (push "C:/path/to/xl-repl/site-lisp" *load-path*)
+        (require "xl-repl")
 
 
 ## Usage
@@ -20,7 +26,8 @@ lisp-repl-mode for [xyzzy](http://www.jsdlab.co.jp/~kamei/)
 
 ## Keymap
 
-`ed:*lisp-mode-map*` のコピーに以下のキーバインドを上書き
+REPLバッファ用キーマップ `repl:*keymap*` は、 `ed:*lisp-mode-map*` をベースにして
+以下のキーバインドを追加/上書きしています。
 
 - RET -- repl::newline-or-eval-input  (入力した式を評価 / 書きかけならlisp-newline-and-indent)
 - C-l -- repl::clear-repl  (REPLバッファをクリア)
@@ -64,7 +71,7 @@ lisp-repl-mode for [xyzzy](http://www.jsdlab.co.jp/~kamei/)
         ; default-directoryを*load-path*に含めて(require 'name)を評価
 
 
-適当に省略してもOK.
+適当に省略してもOK。
 
     user> :pa repl.command     ; :packageコマンド
     #<package: repl.command>
