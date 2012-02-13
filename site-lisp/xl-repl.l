@@ -414,9 +414,7 @@
 		    ((macro-function funcsym) "Macro")
 		    ((commandp funcsym) "Command Function")
 		    (t (if builtin? "Builtin Function" "Function")))
-	      (package-name pkg) exported? name
-	      (let ((*package* pkg))
-		(if arg (format nil "~S" arg) "()"))
+	      (package-name pkg) exported? name (or arg "()")
 	      (substitute-string doc "\n" "\n    ;")))))
 
 (defun show-variable-description (varsym)
