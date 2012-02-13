@@ -50,7 +50,7 @@
 	  *error-style*
 	  *startup-hook*))
 
-(defvar *buffer-name* "*REPL*")
+(defvar *buffer-name* "*repl*")
 (defvar *greeting* ";;; xyzzy lisp REPL")
 (defvar *prompt* "%p>")
 (defvar *prompt-style* '(:foreground 12 :bold t))
@@ -72,6 +72,7 @@
 
 (defvar-local *input-history* nil)
 (defvar-local *input-history-index* nil)
+
 
 ;;; utilities
 (defmacro iflet (var test then else)
