@@ -69,7 +69,7 @@ lisp-repl-mode for [xyzzy](http://www.jsdlab.co.jp/~kamei/)
     user> :pa repl.command     ; :packageコマンド
     #<package: repl.command>
     
-    repl.command> :de package  ; :descコマンド
+    repl.command> :de package  ; :describeコマンド
     <Function> repl.command::package (name)
         ; (in-package 'name)を評価
 
