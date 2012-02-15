@@ -227,7 +227,9 @@
 		    (setq *** ** ** * * (car results) +++ ++ ++ + + expr
 			  /// // // / / (if (cdr results) results *)
 			  *buffer-package* (or (package-name *package*) "user"))
-		    (format t "~{~S~^ ;~%~}~%~%" results)))))))
+		    (dolist (v results)
+		      (format t "~:[~S~;~A~]~%" (si:*structurep v) v))
+		    (format t "~%~%")))))))
       (error (c)
 	(set-buffer replbuf)
 	(let ((start (point-max)))
