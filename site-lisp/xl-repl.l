@@ -205,13 +205,14 @@
 	  (set (cadr out) #0=(apply com args)))
       #0#)))
 
-(defun eval-and-print (input)
+(defun eval-and-print (input &optional do-not-record)
   (let ((*package* (or (find-package *buffer-package*) (find-package "user")))
 	(*standard-input* ed:*cooked-mode-input-stream*)
 	(*standard-output* *standard-output*)
 	(*error-output* (if si:*trace-on-error* (make-string-output-stream) *error-output*))
 	(replbuf (selected-buffer)))
-    (save-input-history input)
+    (unless do-not-record
+      (save-input-history input))
     (handler-case
 	(let ((forms (read-all-from-string input)))
 	  (with-output-to-buffer (replbuf (point-max))
@@ -366,6 +367,12 @@
   (let ((syms (list-symbols nil :pattern pattern)))
     (format t "~{~S~%~}" syms)))
 
+;; utility
+(defun repl.command::time (form)
+  "form‚ğ•]‰¿‚µAÀsŠÔ(ƒ~ƒŠ•b)‚ğ•\¦"
+  (let ((start (get-internal-real-time)))
+    (eval-and-print (write-to-string form) t)
+    (format t "~&~D msec~%" (- (get-internal-real-time) start))))
 
 ;; helpŒn
 (defun repl.command::help (&optional pattern)
