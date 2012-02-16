@@ -230,7 +230,11 @@
 			  /// // // / / (if (cdr results) results *)
 			  *buffer-package* (or (package-name *package*) "user"))
 		    (dolist (v results)
-		      (format t "~:[~S~;~A~]~%" (si:*structurep v) v))
+		      (format t "~:[~S~;~A~]~%"
+			      (and (si:*structurep v)
+				   (si:*structure-definition-print-function
+				    (si:*structure-definition v)))
+			      v))
 		    (format t "~%~%")))))))
       (error (c)
 	(set-buffer replbuf)
