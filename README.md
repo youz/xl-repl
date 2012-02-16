@@ -43,11 +43,14 @@ REPLバッファ用キーマップ `repl:*keymap*` は、 `ed:*lisp-mode-map*` �
     :cd (&optional dir)
         ; default-directoryをdirへ移動 (dir省略時はdefault-directoryを表示)
 
-    :descible (symbol-or-package-name)
+    :describe (symbol-or-package-name)
         ; パッケージ/変数/定数/関数の説明を表示
 
     :dir (&optional wildcard)
         ; default-directoryのファイルを列挙
+
+    :expand (form)
+        ; formをmacroexpandして表示
 
     :help (&optional pattern)
         ; REPLコマンドの説明を表示
@@ -57,6 +60,12 @@ REPLバッファ用キーマップ `repl:*keymap*` は、 `ed:*lisp-mode-map*` �
 
     :ls (&optional pat (pkg *package*))
         ; パッケージ内の変数/定数/関数シンボルを列挙
+
+    :lsall (&optional pattern)
+        ; 全パッケージの変数/定数/関数シンボルを列挙
+
+    :lsext (&optional pattern (pkg *package*))
+        ; パッケージよりexportされている変数/定数/関数シンボルを列挙
 
     :lspkg (&optional pattern)
         ; パッケージ名を列挙 (nicknamesがあれば括弧内に表示)
@@ -69,6 +78,9 @@ REPLバッファ用キーマップ `repl:*keymap*` は、 `ed:*lisp-mode-map*` �
 
     :require (name)
         ; default-directoryを*load-path*に含めて(require 'name)を評価
+
+    :time (form)
+        ; formを評価し、実行時間(ミリ秒)を表示
 
 
 適当に省略してもOK。
