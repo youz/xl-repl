@@ -379,7 +379,7 @@
     (eval-and-print (write-to-string form) t)
     (format t "~&~D msec~%" (- (get-internal-real-time) start))))
 
-(defparameter *symbols-need-newline*
+(defvar *symbols-need-newline*
   '(block tagbody progn catch let "let\\*" when unless))
 
 (defun repl.command::expand (form)
