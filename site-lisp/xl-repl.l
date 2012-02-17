@@ -349,7 +349,7 @@
       (loop
 	(multiple-value-bind (f sym stype spkg) (iter)
 	  (unless f (return))
-	  (when (and (or (null pkg) (eq (symbol-package sym) pkg))
+	  (when (and (or (null pkg) (eq spkg pkg))
 		     (or (boundp sym) (fboundp sym))
 		     (or (and external (eq stype :external))
 			 (and internal (eq stype :internal)))
