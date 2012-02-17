@@ -290,12 +290,12 @@
 
 ;;; repl command
 (defun repl.command::require (name)
-  "default-directory‚ð*load-path*‚ÉŠÜ‚ß‚Ä(require 'name)‚ð•]‰¿"
+  "*load-path*‚Édefault-directory‚ðŠÜ‚ß‚Ä(require 'name)‚ð•]‰¿"
   (let ((*load-path* (cons (default-directory) *load-path*)))
     (princ (require name))))
 
 (defun repl.command::load (name)
-  "default-directory‚ð*load-path*‚ÉŠÜ‚ß‚Ä(load-library 'name)‚ð•]‰¿"
+  "*load-path*‚Édefault-directory‚ðŠÜ‚ß‚Ä(load-library 'name)‚ð•]‰¿"
   (let ((*load-path* (cons (default-directory) *load-path*)))
     (princ (load-library name))))
 

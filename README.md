@@ -56,7 +56,7 @@ REPLバッファ用キーマップ `repl:*keymap*` は、 `ed:*lisp-mode-map*` �
         ; REPLコマンドの説明を表示
 
     :load (name)
-        ; default-directoryを*load-path*に含めて(load-library 'name)を評価
+        ; *load-path*にdefault-directoryを含めて(load-library 'name)を評価
 
     :ls (&optional pat (pkg *package*))
         ; パッケージ内の変数/定数/関数シンボルを列挙
@@ -77,7 +77,7 @@ REPLバッファ用キーマップ `repl:*keymap*` は、 `ed:*lisp-mode-map*` �
         ; (in-package 'name)を評価
 
     :require (name)
-        ; default-directoryを*load-path*に含めて(require 'name)を評価
+        ; *load-path*にdefault-directoryを含めて(require 'name)を評価
 
     :time (form)
         ; formを評価し、実行時間(秒)を表示
