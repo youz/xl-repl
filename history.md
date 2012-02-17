@@ -1,0 +1,30 @@
+# xl-repl 変更履歴
+
+
+## 2012/02/17  v1.0.0
+
+### 新機能
+
+* expandコマンド -- マクロフォームを展開して表示
+* timeコマンド -- 処理時間を計測して表示
+
+### 変更点
+
+* ls系コマンドの表示で、カレントパッケージのシンボルにもパッケージ修飾子を付けるように変更
+* ls系コマンドの表示で、関数/マクロは引数も表示するように変更
+* 評価結果がprint-functionを持つ構造体の場合、format指示子~Aを使って印字するように変更
+    [Issue #1](https://github.com/youz/xl-repl/issues/1)
+
+### 修正
+
+* 評価結果が循環参照を含む場合に対応
+    [Issue #2](https://github.com/youz/xl-repl/issues/2)
+* REPL変数 `/` の内容をCL仕様準拠に変更
+    [Issue #4](https://github.com/youz/xl-repl/issues/4)
+* 評価結果表示の前にfresh-lineを行うように変更
+    [Issue #5](https://github.com/youz/xl-repl/issues/5)
+
+
+## 2012/02/13  v0.9.0
+
+* αリリース
