@@ -359,18 +359,24 @@
 
 (defun repl.command::ls (&optional pat (pkg *package*))
   "パッケージ内の変数/定数/関数シンボルを列挙"
-  (let ((syms (list-symbols (find-package pkg) :pattern pat)))
-    (format t "~{~S~%~}" syms)))
+  (mapc #'(lambda (sym)
+	    (show-variable-description sym nil)
+	    (show-function-description sym nil))
+	(list-symbols (find-package pkg) :pattern pat)))
 
 (defun repl.command::lsext (&optional pattern (pkg *package*))
   "パッケージよりexportされている変数/定数/関数シンボルを列挙"
-  (let ((syms (list-symbols (find-package pkg) :pattern pattern :internal nil)))
-    (format t "~{~S~%~}" syms)))
+  (mapc #'(lambda (sym)
+	    (show-variable-description sym nil)
+	    (show-function-description sym nil))
+	(list-symbols (find-package pkg) :pattern pattern :internal nil)))
 
 (defun repl.command::lsall (&optional pattern)
   "全パッケージの変数/定数/関数シンボルを列挙"
-  (let ((syms (list-symbols nil :pattern pattern)))
-    (format t "~{~S~%~}" syms)))
+  (mapc #'(lambda (sym)
+	    (show-variable-description sym nil)
+	    (show-function-description sym nil))
+	(list-symbols nil :pattern pattern)))
 
 ;; utility
 (defun repl.command::time (form)
