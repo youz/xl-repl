@@ -227,7 +227,7 @@
 		  (save-excursion
 		    (set-buffer replbuf)
 		    (setq *** ** ** * * (car results) +++ ++ ++ + + expr
-			  /// // // / / (if (cdr results) results *)
+			  /// // // / / results
 			  *buffer-package* (or (package-name *package*) "user"))
 		    (dolist (v results)
 		      (format t "~:[~S~;~A~]~%"
