@@ -229,12 +229,12 @@
 		    (setq *** ** ** * * (car results) +++ ++ ++ + + expr
 			  /// // // / / results
 			  *buffer-package* (or (package-name *package*) "user"))
-		    (dolist (v results)
-		      (format t "~:[~S~;~A~]~%"
+		    (whilet v (pop results)
+		      (format t "~&~:[~S~;~A~]~@[ ;~]"
 			      (and (si:*structurep v)
 				   (si:*structure-definition-print-function
 				    (si:*structure-definition v)))
-			      v))
+			      v results))
 		    (format t "~%~%")))))))
       (error (c)
 	(set-buffer replbuf)
