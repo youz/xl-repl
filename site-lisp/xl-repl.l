@@ -380,10 +380,12 @@
 
 ;; utility
 (defun repl.command::time (form)
-  "form‚ğ•]‰¿‚µAÀsŠÔ(ƒ~ƒŠ•b)‚ğ•\¦"
+  "form‚ğ•]‰¿‚µAÀsŠÔ(•b)‚ğ•\¦"
   (let ((start (get-internal-real-time)))
     (eval-and-print (write-to-string form) t)
-    (format t "~&~D msec~%" (- (get-internal-real-time) start))))
+    (buffer-stream-set-point *standard-output* (point-max))
+    (format t "~&----------~%~,3F sec.~%"
+	    (/ (- (get-internal-real-time) start) 1000))))
 
 (defvar *symbols-need-newline*
   '(block tagbody progn catch let "let\\*" when unless))
