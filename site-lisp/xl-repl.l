@@ -394,10 +394,10 @@
 	(symsre (format nil "(\\(~{~A~^\\|~}\\)" *symbols-need-newline*)))
     (format t "~S" (macroexpand form))
     (goto-char start)
-    (while (scan-buffer symsre :tail t :regexp t)
+    (while (scan-buffer symsre :regexp t)
+      (forward-char)
       (let ((sym (find-symbol (match-string 1) :lisp)))
 	(forward-sexp (or (get sym 'ed::lisp-indent-hook) 0))
-	(insert #\LFD)
 	(save-excursion
 	  (while (ignore-errors (forward-sexp))
 	    (when (char/= (char-after (point)) #\))
