@@ -16,7 +16,16 @@ lisp-repl-mode for [xyzzy](http://www.jsdlab.co.jp/~kamei/)
     `git clone git://github.com/youz/xl-repl.git` して `~/.xyzzy` に以下の設定を記述
 
         (push "C:/path/to/xl-repl/site-lisp" *load-path*)
+
+- 共通
+
+    .xyzzy もしくは site-lisp/siteinit.l に以下の設定を記述
+
         (require "xl-repl")
+        ; ldoc, ldoc2 を使っている場合
+        (push 'ed:lisp-repl-mode ed::*ldoc-activated-mode-list*)
+        ; ac-mode を使っている場合
+        (push 'ed:lisp-repl-mode ed::*ac-mode-lisp-mode*)
 
 
 ## Usage
