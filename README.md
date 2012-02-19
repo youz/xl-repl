@@ -21,11 +21,11 @@ lisp-repl-mode for [xyzzy](http://www.jsdlab.co.jp/~kamei/)
 
 - (共通) `.xyzzy` or `site-lisp/siteinit.l` の設定
 
-    (require "xl-repl")
-    ; ldoc, ldoc2 を使っている場合
-    (push 'ed:lisp-repl-mode ed::*ldoc-activated-mode-list*)
-    ; ac-mode を使っている場合
-    (push 'ed:lisp-repl-mode ed::*ac-mode-lisp-mode*)
+        (require "xl-repl")
+        ; ldoc, ldoc2 を使っている場合
+        (push 'ed:lisp-repl-mode ed::*ldoc-activated-mode-list*)
+        ; ac-mode を使っている場合
+        (push 'ed:lisp-repl-mode ed::*ac-mode-lisp-mode*)
 
 
 ## Usage
