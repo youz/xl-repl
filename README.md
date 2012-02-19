@@ -13,19 +13,19 @@ lisp-repl-mode for [xyzzy](http://www.jsdlab.co.jp/~kamei/)
 
 - 手動インストール
 
-    `git clone git://github.com/youz/xl-repl.git` して `~/.xyzzy` に以下の設定を記述
+    `git clone git://github.com/youz/xl-repl.git` でソースツリーをコピーし、
+    コピー先のパスを`*load-path*`へ追加して下さい。
 
+        ;; 設定例 (.xyzzy もしくは site-lisp/siteinit.l へ追記)
         (push "C:/path/to/xl-repl/site-lisp" *load-path*)
 
-- 共通
+- (共通) `.xyzzy` or `site-lisp/siteinit.l` の設定
 
-    .xyzzy もしくは site-lisp/siteinit.l に以下の設定を記述
-
-        (require "xl-repl")
-        ; ldoc, ldoc2 を使っている場合
-        (push 'ed:lisp-repl-mode ed::*ldoc-activated-mode-list*)
-        ; ac-mode を使っている場合
-        (push 'ed:lisp-repl-mode ed::*ac-mode-lisp-mode*)
+    (require "xl-repl")
+    ; ldoc, ldoc2 を使っている場合
+    (push 'ed:lisp-repl-mode ed::*ldoc-activated-mode-list*)
+    ; ac-mode を使っている場合
+    (push 'ed:lisp-repl-mode ed::*ac-mode-lisp-mode*)
 
 
 ## Usage
