@@ -229,12 +229,13 @@
 		    (setq *** ** ** * * (car results) +++ ++ ++ + + expr
 			  /// // // / / results
 			  *buffer-package* (or (package-name *package*) "user"))
-		    (whilet v (pop results)
-		      (format t "~&~:[~S~;~A~]~@[ ;~]"
-			      (and (si:*structurep v)
-				   (si:*structure-definition-print-function
-				    (si:*structure-definition v)))
-			      v results))
+		    (while results
+		      (let ((v (pop results)))
+			(format t "~&~:[~S~;~A~]~@[ ;~]"
+				(and (si:*structurep v)
+				     (si:*structure-definition-print-function
+				      (si:*structure-definition v)))
+				v results)))
 		    (format t "~%~%")))))))
       (error (c)
 	(set-buffer replbuf)
