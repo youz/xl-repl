@@ -178,7 +178,7 @@
   (save-excursion
     (multiple-value-bind (from to tag)
 	(find-text-attribute-point (point))
-      (cond ((find tag '(stdout prompt)) nil)
+      (cond (#0=(find tag '(stdout prompt error)) nil)
 	    ((eq tag 'values)
 	     (goto-eol)
 	     (backward-sexp)
@@ -188,9 +188,9 @@
 	    ((null tag)
 	     (multiple-value-bind (from to) (previous-prompt-point)
 	       (iflet np (next-prompt-point)
-		 (let ((outp (find-text-attribute 'stdout :start to :end np))
-		       (valp (find-text-attribute 'values :start to :end np)))
-		   (buffer-substring to (1- (or outp valp np))))
+		 (let ((p (find-text-attribute-if
+			   (lambda (tag) #0#) :start to :end np)))
+		   (buffer-substring to (1- (or p np))))
 		 (buffer-substring to (point-max)))))))))
 
 (defun input-complete-p ()
@@ -273,7 +273,8 @@
 			  (nreverse (member-if (lambda (l) (string-match "^>CALL STACK +[0-9]+: (eval " l)) lines))
 			  (car lines)))
 	      (format t "~A~%~%" (si:*condition-string c))))
-	  (apply #'set-text-attribute start (- (point-max) 2) 'error *error-style*))))))
+	  (apply #'set-text-attribute start (point-max)
+		 'error *error-style*))))))
 
 (defun newline-or-eval-input ()
   (interactive)
