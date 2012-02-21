@@ -245,12 +245,13 @@
 		(let ((results (multiple-value-list (eval expr))))
 		  (save-excursion
 		    (set-buffer replbuf)
-		    (when (> (point-max) stdout-start)
-		      (apply #'set-text-attribute stdout-start (point-max)
-			     'stdout *stdout-style*))
 		    (setq *** ** ** * * (car results) +++ ++ ++ + + expr
 			  /// // // / / results
 			  *buffer-package* (or (package-name *package*) "user"))
+		    (fresh-line)
+		    (when (> (point-max) stdout-start)
+		      (apply #'set-text-attribute stdout-start (point-max)
+			     'stdout *stdout-style*))
 		    (let ((values-start (point-max)))
 		      (while results
 			(let ((v (pop results)))
