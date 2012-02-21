@@ -388,28 +388,38 @@
     (format t "~&----------~%~,3F sec.~%"
 	    (/ (- (get-internal-real-time) start) 1000))))
 
-(defvar *symbols-need-newline*
-  '(block tagbody progn catch let "let\\*" when unless))
+(defun indent-hook (sym)
+  (let ((i (get sym 'ed::lisp-indent-hook))
+	(m (macro-function sym)))
+    (cond ((eq i 'defun) 2)
+	  (i i)
+	  (m (position '&body (cadr m))))))
+
+(defun prettify-region (from to)
+  (interactive)
+  (save-restriction
+    (narrow-to-region from to)
+    (goto-char from)
+    (while (scan-buffer "(\\(\\_s+\\) " :regexp t)
+      (unless (parse-point-syntax)
+	(forward-char)
+	(whenlet i (indent-hook (read-from-string (match-string 1)))
+	  (forward-sexp i)
+	  (save-excursion
+	    (while (ignore-errors (forward-sexp))
+	      (when (char/= (char-after (point)) #\))
+		(insert #\LFD)))))))
+    (goto-char (point-min))
+    (while (scan-buffer "))+" :tail t :regexp t)
+      (unless (or (parse-point-syntax) (char= (char-after (point)) #\LFD))
+	(insert #\LFD)))
+    (indent-region (point-min) (point-max))))
 
 (defun repl.command::expand (form)
   "form‚ðmacroexpand‚µ‚Ä•\Ž¦"
-  (let ((start (point))
-	(symsre (format nil "(\\(~{~A~^\\|~}\\)" *symbols-need-newline*)))
+  (let ((start (point)))
     (format t "~S" (macroexpand form))
-    (goto-char start)
-    (while (scan-buffer symsre :regexp t)
-      (forward-char)
-      (let ((sym (find-symbol (match-string 1) :lisp)))
-	(forward-sexp (or (get sym 'ed::lisp-indent-hook) 0))
-	(save-excursion
-	  (while (ignore-errors (forward-sexp))
-	    (when (char/= (char-after (point)) #\))
-	      (insert #\LFD))))))
-    (goto-char start)
-    (while (scan-buffer ")+" :tail t :regexp t)
-      (unless (or (parse-point-syntax) (char= (char-after (point)) #\LFD))
-	(insert #\LFD)))
-    (indent-region start (point-max))))
+    (prettify-region start (point-max))))
 
 ;; helpŒn
 (defun repl.command::help (&optional pattern)
