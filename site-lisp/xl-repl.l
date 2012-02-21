@@ -232,8 +232,9 @@
 		(let ((results (multiple-value-list (eval expr))))
 		  (save-excursion
 		    (set-buffer replbuf)
-		    (apply #'set-text-attribute (1- stdout-start) (point-max)
-			   'output *stdout-style*)
+		    (when (> (point-max) stdout-start)
+		      (apply #'set-text-attribute stdout-start (point-max)
+			     'stdout *stdout-style*))
 		    (setq *** ** ** * * (car results) +++ ++ ++ + + expr
 			  /// // // / / results
 			  *buffer-package* (or (package-name *package*) "user"))
@@ -245,9 +246,9 @@
 				       (si:*structure-definition-print-function
 					(si:*structure-definition v)))
 				  v results)))
+		      (terpri)
 		      (apply #'set-text-attribute values-start (point-max)
-			     'values *values-style*))
-		    (format t "~%~%")))))))
+			     'values *values-style*))))))))
       (error (c)
 	(set-buffer replbuf)
 	(let ((start (point-max)))
