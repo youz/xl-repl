@@ -61,6 +61,7 @@
 
 (defparameter *keymap* (copy-keymap ed::*lisp-mode-map*))
 (define-key *keymap* #\RET 'newline-or-eval-input)
+(define-key *keymap* #\LFD 'lisp-newline-and-indent)
 (define-key *keymap* #\C-h 'repl-backward-delete-char)
 (define-key *keymap* #\Delete 'repl-delete-char-or-selection)
 (define-key *keymap* #\C-d 'repl-delete-char-or-selection)
