@@ -47,6 +47,8 @@
 	  *keymap*
 	  *prompt*
 	  *prompt-style*
+	  *stdout-style*
+	  *values-style*
 	  *error-style*
 	  *startup-hook*))
 
@@ -54,6 +56,8 @@
 (defvar *greeting* ";;; xyzzy lisp REPL")
 (defvar *prompt* "%p>")
 (defvar *prompt-style* '(:foreground 12 :bold t))
+(defvar *stdout-style* '(:foreground 11))
+(defvar *values-style* '(:foreground 4))
 (defvar *error-style* '(:foreground 1))
 (defvar *startup-hook* nil)
 (defvar *startup-package* "user")
@@ -216,8 +220,9 @@
     (unless do-not-record
       (save-input-history input))
     (handler-case
-	(let ((forms (read-all-from-string input)))
-	  (with-output-to-buffer (replbuf (point-max))
+	(let ((forms (read-all-from-string input))
+	      (stdout-start (point-max)))
+	  (with-output-to-buffer (replbuf stdout-start)
 	    (iflet com (repl-command-p (car forms))
 	      (progn
 		(invoke-repl-command com (cdr forms))
@@ -227,16 +232,21 @@
 		(let ((results (multiple-value-list (eval expr))))
 		  (save-excursion
 		    (set-buffer replbuf)
+		    (apply #'set-text-attribute (1- stdout-start) (point-max)
+			   'output *stdout-style*)
 		    (setq *** ** ** * * (car results) +++ ++ ++ + + expr
 			  /// // // / / results
 			  *buffer-package* (or (package-name *package*) "user"))
-		    (while results
-		      (let ((v (pop results)))
-			(format t "~&~:[~S~;~A~]~@[ ;~]"
-				(and (si:*structurep v)
-				     (si:*structure-definition-print-function
-				      (si:*structure-definition v)))
-				v results)))
+		    (let ((values-start (point-max)))
+		      (while results
+			(let ((v (pop results)))
+			  (format t "~&~:[~S~;~A~]~@[ ;~]"
+				  (and (si:*structurep v)
+				       (si:*structure-definition-print-function
+					(si:*structure-definition v)))
+				  v results)))
+		      (apply #'set-text-attribute values-start (point-max)
+			     'values *values-style*))
 		    (format t "~%~%")))))))
       (error (c)
 	(set-buffer replbuf)
