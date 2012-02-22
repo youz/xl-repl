@@ -50,7 +50,8 @@
 	  *stdout-style*
 	  *values-style*
 	  *error-style*
-	  *startup-hook*))
+	  *startup-hook*
+	  *return-behavior*))
 
 (defvar *buffer-name* "*repl*")
 (defvar *greeting* ";;; xyzzy lisp REPL")
@@ -61,7 +62,10 @@
 (defvar *error-style* '(:foreground 1))
 (defvar *startup-hook* nil)
 (defvar *startup-package* "user")
-(defvar *locked-packages* '(:system :lisp :editor :user :repl :repl.command))
+(defvar *return-behavior* :send-if-complete
+  "Return押下時の挙動
+* :send-if-complete - カーソルが式の途中にあっても式が完成していれば実行
+* :send-only-if-after-complete - カーソルが式の後ろにある場合のみ実行")
 
 (defparameter *keymap* (copy-keymap ed::*lisp-mode-map*))
 (define-key *keymap* #\RET 'newline-or-eval-input)
@@ -194,12 +198,13 @@
 
 (defun input-complete-p ()
   (save-excursion
-    (goto-char (nth-value 1 (previous-prompt-point)))
-    (let ((pmax (point-max)))
-      (while (and (< (point) pmax)
-		  (ignore-errors (forward-sexp)))
-	(skip-chars-forward " \t\n"))
-      (eq (point) pmax))))
+    (unless (eq *return-behavior* :send-only-if-after-complete)
+      (goto-char (point-max)))
+    (let ((start (nth-value 1 (previous-prompt-point))))
+      (while (and (> (point) start)
+		  (ignore-errors (backward-sexp)))
+	(skip-chars-backward " \t\n"))
+      (<= (point) start))))
 
 (defun repl-command-p (x)
   (when (keywordp x)
