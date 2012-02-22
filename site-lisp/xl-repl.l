@@ -178,8 +178,8 @@
   (save-excursion
     (multiple-value-bind (from to tag)
 	(find-text-attribute-point (point))
-      (cond ((find tag '(stdout prompt error)) nil)
-	    ((eq tag 'values)
+      (cond ((find tag '(stdout cmdout prompt error)) nil)
+	    ((eql tag 'values)
 	     (goto-eol)
 	     (backward-sexp)
 	     (let ((p (point)))
@@ -189,7 +189,7 @@
 	     (multiple-value-bind (from to) (previous-prompt-point)
 	       (iflet np (next-prompt-point)
 		 (let ((p (find-text-attribute-if
-			   (lambda (tag) (find tag '(stdout values prompt error)))
+			   (lambda (tag) (find tag '(stdout cmdout values error)))
 			   :start to :end np)))
 		   (buffer-substring to (1- (or p np))))
 		 (buffer-substring to (point-max)))))))))
@@ -240,7 +240,8 @@
 	    (iflet com (repl-command-p (car forms))
 	      (progn
 		(invoke-repl-command com (cdr forms))
-		(format t "~&~%"))
+		(format t "~&~%")
+		(set-text-attribute stdout-start (point-max) 'cmdout))
 	      (dolist (expr forms)
 		(save-excursion (set-buffer replbuf) (setq - expr))
 		(let ((results (multiple-value-list (eval expr))))
