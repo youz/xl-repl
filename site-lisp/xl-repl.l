@@ -198,7 +198,7 @@
     (let ((pmax (point-max)))
       (while (and (< (point) pmax)
 		  (ignore-errors (forward-sexp)))
-	(skip-chars-backward " \t\n"))
+	(skip-chars-forward " \t\n"))
       (eq (point) pmax))))
 
 (defun repl-command-p (x)
