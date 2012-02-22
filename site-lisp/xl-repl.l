@@ -178,7 +178,7 @@
   (save-excursion
     (multiple-value-bind (from to tag)
 	(find-text-attribute-point (point))
-      (cond (#0=(find tag '(stdout prompt error)) nil)
+      (cond ((find tag '(stdout prompt error)) nil)
 	    ((eq tag 'values)
 	     (goto-eol)
 	     (backward-sexp)
@@ -189,7 +189,8 @@
 	     (multiple-value-bind (from to) (previous-prompt-point)
 	       (iflet np (next-prompt-point)
 		 (let ((p (find-text-attribute-if
-			   (lambda (tag) #0#) :start to :end np)))
+			   (lambda (tag) (find tag '(stdout values prompt error)))
+			   :start to :end np)))
 		   (buffer-substring to (1- (or p np))))
 		 (buffer-substring to (point-max)))))))))
 
