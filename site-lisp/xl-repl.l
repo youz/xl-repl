@@ -215,12 +215,9 @@
 	  (car syms))))))
 
 (defun invoke-repl-command (com args)
-  (let ((out (member-if #'(lambda (s) (and (symbolp s) (string= (symbol-name s) ">")))
-			args)))
-    (if out
-	(let ((args (subseq args 0 (position '> args :test #'string=))))
-	  (set (cadr out) #0=(apply com args)))
-      #0#)))
+  (iflet redirect (position :> args)
+    (set (nth (1+ redirect) args) (apply com (subseq args 0 redirect)))
+    (apply com args)))
 
 (defun eval-and-print (input &optional do-not-record)
   (let ((*package* (or (find-package *buffer-package*) (find-package "user")))
