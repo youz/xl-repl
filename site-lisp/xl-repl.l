@@ -228,9 +228,13 @@
   (let ((*package* (or (find-package *buffer-package*) (find-package "user")))
 	(*standard-input* ed:*cooked-mode-input-stream*)
 	(*standard-output* *standard-output*)
-	(*error-output* (if si:*trace-on-error* (make-string-output-stream) *error-output*))
+	(*error-output* *error-output*)
+	(estr nil)
 	(*print-circle* t)
 	(replbuf (selected-buffer)))
+    (when si:*trace-on-error*
+      (setq estr (make-string-output-stream)
+	    *error-output* (make-broadcast-stream *error-output* estr)))
     (unless do-not-record
       (save-input-history input))
     (handler-case
@@ -271,7 +275,7 @@
 	(let ((start (point-max)))
 	  (with-output-to-buffer (replbuf start)
 	    (if si:*trace-on-error*
-		(let ((lines (nreverse (split-string (get-output-stream-string *error-output*) #\LFD))))
+		(let ((lines (nreverse (split-string (get-output-stream-string estr) #\LFD))))
 		  (format t "~{~A~%~}~A~%~%"
 			  (nreverse (member-if (lambda (l) (string-match "^>CALL STACK +[0-9]+: (eval " l)) lines))
 			  (car lines)))
