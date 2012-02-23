@@ -244,13 +244,13 @@
 	    (iflet com (repl-command-p (car forms))
 	      (progn
 		(invoke-repl-command com (cdr forms))
-		(format t "~&~%")
 		(set-text-attribute stdout-start (point-max) 'cmdout))
 	      (dolist (expr forms)
 		(save-excursion (set-buffer replbuf) (setq - expr))
 		(let ((results (multiple-value-list (eval expr))))
 		  (save-excursion
 		    (set-buffer replbuf)
+		    (buffer-stream-set-point *standard-output* (point-max))
 		    (setq *** ** ** * * (car results) +++ ++ ++ + + expr
 			  /// // // / / results
 			  *buffer-package* (or (package-name *package*) "user"))
