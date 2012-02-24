@@ -39,6 +39,8 @@
 (define-key *keymap* #\C-h 'repl-backward-delete-char)
 (define-key *keymap* #\Delete 'repl-delete-char-or-selection)
 (define-key *keymap* #\C-d 'repl-delete-char-or-selection)
+(define-key *keymap* #\C-a 'repl-goto-bol)
+(define-key *keymap* #\Home 'repl-goto-bol)
 (define-key *keymap* #\C-l 'clear-repl)
 (define-key *keymap* #\M-C-a 'beginning-of-input)
 (define-key *keymap* #\M-C-e 'end-of-input)
@@ -98,6 +100,13 @@
     (multiple-value-bind (from to) (previous-prompt-point)
       (unless (<= from p (1- to))
 	(delete-char-or-selection n)))))
+
+(defun repl-goto-bol ()
+  (interactive)
+  (goto-bol)
+  (multiple-value-bind (from to tag) (find-text-attribute-point (point))
+    (when (eql tag 'prompt)
+      (goto-char to))))
 
 (defun clear-repl ()
   (interactive)
