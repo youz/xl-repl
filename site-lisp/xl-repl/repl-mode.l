@@ -46,6 +46,7 @@
 (define-key *keymap* #\M-C-e 'end-of-input)
 (define-key *keymap* #\M-p 'previous-input)
 (define-key *keymap* #\M-n 'next-input)
+(define-key *keymap* '(#\C-c #\C-u) 'kill-current-input)
 
 (defvar-local *input-history* nil)
 (defvar-local *input-history-index* nil)
@@ -121,6 +122,11 @@
 	(show-prompt)
       (delete-region p (point-max)))))
 
+(defun kill-current-input ()
+  (interactive)
+  (whenlet p (and (not (next-prompt-point))
+		  (nth-value 1 (previous-prompt-point)))
+    (kill-region p (point-max))))
 
 (defun beginning-of-input ()
   (interactive)
