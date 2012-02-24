@@ -115,9 +115,9 @@
   (save-restriction
     (narrow-to-region from to)
     (goto-char from)
-    (while (scan-buffer "(\\(\\_s+\\) " :regexp t :no-dup t)
+    (while (scan-buffer "(\\(\\_s+\\) " :regexp t)
+      (forward-char)
       (unless (parse-point-syntax)
-	(forward-char)
 	(whenlet i (indent-hook (read-from-string (match-string 1)))
 	  (forward-sexp i)
 	  (save-excursion
