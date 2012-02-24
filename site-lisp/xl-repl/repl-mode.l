@@ -44,9 +44,11 @@
 (define-key *keymap* #\C-l 'clear-repl)
 (define-key *keymap* #\M-C-a 'beginning-of-input)
 (define-key *keymap* #\M-C-e 'end-of-input)
-(define-key *keymap* #\M-p 'previous-input)
 (define-key *keymap* #\M-n 'next-input)
+(define-key *keymap* #\M-p 'previous-input)
 (define-key *keymap* '(#\C-c #\C-u) 'kill-current-input)
+(define-key *keymap* '(#\C-c #\C-n) 'goto-next-prompt)
+(define-key *keymap* '(#\C-c #\C-p) 'goto-previous-prompt)
 
 (defvar-local *input-history* nil)
 (defvar-local *input-history-index* nil)
@@ -81,11 +83,11 @@
     (when default (insert default))
     #0#))
 
-(defmacro previous-prompt-point ()
-  `(find-text-attribute 'prompt :end (point) :from-end t))
+(defmacro previous-prompt-point (&optional p)
+  `(find-text-attribute 'prompt :end ,(or p '(point)) :from-end t))
 
-(defmacro next-prompt-point ()
-  `(find-text-attribute 'prompt :start (point)))
+(defmacro next-prompt-point (&optional p)
+  `(find-text-attribute 'prompt :start ,(or p '(point))))
 
 (defun repl-backward-delete-char (&optional (n 1))
   (interactive "p")
@@ -136,6 +138,18 @@
 (defun end-of-input ()
   (interactive)
   (goto-char (or (next-prompt-point) (point-max))))
+
+(defun goto-previous-prompt ()
+  (interactive "p")
+  (whenlet c (previous-prompt-point)
+    (whenlet p (nth-value 1 (previous-prompt-point c))
+      (goto-char p))))
+
+(defun goto-next-prompt ()
+  (interactive)
+  (whenlet n (nth-value 1 (next-prompt-point))
+    (goto-char n)))
+
 
 (defun get-input ()
   (multiple-value-bind (from to) (previous-prompt-point)
