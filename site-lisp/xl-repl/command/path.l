@@ -1,4 +1,4 @@
-;;; -*- mode:lisp; package:repl.command.std -*-
+;;; -*- mode:lisp; package:repl -*-
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (require "xl-repl/repl-mode"))
