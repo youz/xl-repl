@@ -111,7 +111,7 @@
 	    (m (position '&body (cadr m)))))))
 
 (defun prettify-region (from to)
-  (interactive)
+  (interactive "r")
   (save-restriction
     (narrow-to-region from to)
     (goto-char from)
