@@ -42,8 +42,8 @@
 (define-key *keymap* #\C-l 'clear-repl)
 (define-key *keymap* #\M-C-a 'beginning-of-input)
 (define-key *keymap* #\M-C-e 'end-of-input)
-(define-key *keymap* #\C-p 'previous-input)
-(define-key *keymap* #\C-n 'next-input)
+(define-key *keymap* #\M-p 'previous-input)
+(define-key *keymap* #\M-n 'next-input)
 
 (defvar-local *input-history* nil)
 (defvar-local *input-history-index* nil)
