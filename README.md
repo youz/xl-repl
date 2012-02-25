@@ -38,12 +38,62 @@ lisp-repl-mode for [xyzzy](http://www.jsdlab.co.jp/~kamei/)
 REPLバッファ用キーマップ `repl:*keymap*` は、 `ed:*lisp-mode-map*` をベースにして
 以下のキーバインドを追加/上書きしています。
 
-- RET -- repl::newline-or-eval-input  (入力した式を評価 / 書きかけならlisp-newline-and-indent)
+- Return -- repl::newline-or-eval-input  (入力した式を評価 or 改行&インデント)
+  * `repl:*return-behavior*` の値によって動作を切り替え (後述)
+- C-j -- lisp-newline-and-indent  (lisp-modeのReturnと同じ)
 - C-l -- repl::clear-repl  (REPLバッファをクリア)
+- C-h -- repl::repl-backward-delete-char
+- C-d, Delete -- repl::repl-delete-char-or-selection
+- C-a, Home -- repl::repl-goto-bol
+- C-c C-u -- repl::kill-current-input (入力中の式をkill-region)
+- C-c C-n -- repl::goto-next-prompt (次のプロンプトへ移動)
+- C-c C-p -- repl::goto-next-prompt (前のプロンプトへ移動)
 - M-C-a -- repl::beginning-of-input  (入力中の式の先頭へ移動)
 - M-C-e -- repl::end-of-input  (入力中の式の最後へ移動)
-- C-p -- repl::previous-input  (入力履歴 - 戻る)
-- C-n -- repl::next-input  (入力履歴 - 進む)
+- M-n -- repl::next-input  (入力履歴 - 進む)
+- M-p -- repl::previous-input  (入力履歴 - 戻る)
+
+## Costomize
+
+カスタマイズ用変数について。
+
+- `repl:*buffer-name*`
+
+  * REPLバッファ名称
+
+- `repl:*greeting*`
+
+  * REPLバッファ先頭に表示するメッセージ
+
+- `repl:*prompt*`
+
+  * プロンプト文字列。以下の変数が使えます。
+  * `%p` -- カレントパッケージ名
+  * `%d` -- カレントディレクトリ (default-directory)
+  * `%u` -- Windowsユーザーネーム (user-name)
+  * `%m` -- PC名 (mathine-name)
+  * `%o` -- OS名 (os-platform)
+  * `%v` -- xyzzyのバージョン (software-version)
+  * `%n` -- ソフト名 (software-type)
+
+- `repl:*prompt-style*`, `repl:*stdout-style*`, `repl:*values-style*`, `repl:*error-style*`
+
+  * プロンプト、標準出力、評価値、エラーメッセージの表示色・装飾
+  * set-text-attributeのキーワード引数の形で指定します。
+
+- `repl:*return-behavior*`
+
+  * 入力式中でのReturn押下時の動作を切り替えます。
+  * :send-if-complete -- 入力式が完成していれば、カーソルが式途中にあっても評価実行
+  * :send-only-if-after-complete -- カーソルが入力式の後ろにある場合のみ評価実行
+  * 入力式が未完成の場合は常にlisp-newline-and-indentを実行します。
+
+### 設定例
+
+    (setq repl:*prompt-style* '(:foreground 14 :bold t)
+          repl:*error-style* '(:foreground 9)
+          repl:*return-behavior* :send-only-if-after-complete)
+
 
 ## REPL Command
 
