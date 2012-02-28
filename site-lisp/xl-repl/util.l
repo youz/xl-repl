@@ -79,14 +79,14 @@
 		       (cadr fun))
 		      ((si:*closurep fun) (cadr (si:closure-body fun)))
 		      (t nil))))
-      (format t "~@[<~A> ~]~A:~:[:~;~]~A ~A~%~@[  ; ~A~%~]"
+      (format t "~@[<~A> ~]~A:~:[:~;~]~A ~:A~%~@[  ; ~A~%~]"
 	      (when detail
 		(cond ((special-form-p funcsym) "Special Operator")
 		      (macro? "Macro")
 		      (builtin? "Builtin Function")
 		      ((commandp funcsym) "Command Function")
 		      (t  "Function")))
-	      (package-name pkg) external? name (or arg "()")
+	      (package-name pkg) external? name arg
 	      (when detail (substitute-string doc "\n" "\n    ;"))))))
 
 (defun show-variable-description (varsym &optional (detail t))
