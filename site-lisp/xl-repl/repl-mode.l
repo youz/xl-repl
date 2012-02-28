@@ -243,7 +243,7 @@
 		      (apply #'set-text-attribute values-start (point-max)
 			     'values *values-style*))
 		    (setq stdout-start (point-max))))))))
-      (error (c)
+      ((or error quit) (c)
 	(set-buffer replbuf)
 	(let ((start (point-max)))
 	  (with-output-to-buffer (replbuf start)
