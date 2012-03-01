@@ -4,7 +4,10 @@
   (require "xl-repl/package"))
 
 (in-package :repl.util)
-(export '(iflet whenlet whilet nth-value read-all-from-string
+(export '(iflet whenlet whilet nth-value
+	  read-all-from-string
+	  print-with-attribute
+	  with-print-to-buffer
 	  list-symbols
 	  show-package-description
 	  show-function-description
@@ -35,6 +38,19 @@
       (do ((s #0=(read is nil eos) #0#))
 	  ((eq s eos) (nreverse forms))
 	(push s forms)))))
+
+(defmacro with-print-to-buffer
+  ((buffer &key tag style (point '(point-max))) &body body)
+  `(save-excursion
+     (set-buffer ,buffer)
+     (let ((#0=#:start ,point)
+	   #1=#:results)
+       (with-output-to-buffer (,buffer #0#)
+	 (setq #1# (multiple-value-list (progn ,@body)))
+	 (fresh-line))
+       (when (> (point-max) #0#)
+	 (apply #'set-text-attribute #0# (point-max) ,tag ,style))
+       (values-list #1#))))
 
 (defun list-symbols (pkg &key pattern (external t) (internal t))
   (let ((syms nil))

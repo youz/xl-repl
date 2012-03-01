@@ -211,50 +211,36 @@
     (unless do-not-record
       (save-input-history input))
     (handler-case
-	(let ((forms (read-all-from-string input))
-	      (stdout-start (point-max)))
-	  (with-output-to-buffer (replbuf stdout-start)
-	    (iflet com (repl-command-p (car forms))
-	      (progn
-		(invoke-repl-command com (cdr forms))
-		(set-text-attribute stdout-start (point-max) 'cmdout))
-	      (dolist (expr forms)
-		(save-excursion (set-buffer replbuf) (setq - expr))
-		(let ((results (multiple-value-list (eval expr))))
-		  (save-excursion
-		    (set-buffer replbuf)
-		    (buffer-stream-set-point *standard-output* (point-max))
-		    (setq *** ** ** * * (car results) +++ ++ ++ + + expr
-			  /// // // / / results
-			  *buffer-package* (or (package-name *package*) "user"))
-		    (fresh-line)
-		    (when (> (point-max) stdout-start)
-		      (apply #'set-text-attribute stdout-start (point-max)
-			     'stdout *stdout-style*))
-		    (let ((values-start (point-max)))
-		      (while results
-			(let ((v (pop results)))
-			  (format t "~&~:[~S~;~A~]~@[ ;~]"
-				  (and (si:*structurep v)
-				       (si:*structure-definition-print-function
-					(si:*structure-definition v)))
-				  v results)))
-		      (terpri)
-		      (apply #'set-text-attribute values-start (point-max)
-			     'values *values-style*))
-		    (setq stdout-start (point-max))))))))
+	(let ((forms (read-all-from-string input)))
+	  (iflet com (repl-command-p (car forms))
+	    (with-print-to-buffer (replbuf :tag 'cmdout)
+	      (invoke-repl-command com (cdr forms)))
+	    (dolist (expr forms)
+	      (save-excursion (set-buffer replbuf) (setq - expr))
+	      (let ((results (with-print-to-buffer (replbuf :tag 'stdout :style *stdout-style*)
+			       (multiple-value-list (eval expr)))))
+		(save-excursion
+		  (set-buffer replbuf)
+		  (setq *** ** ** * * (car results) +++ ++ ++ + + expr
+			/// // // / / results
+			*buffer-package* (or (package-name *package*) "user"))
+		  (with-print-to-buffer (replbuf :tag 'values :style *values-style*)
+		    (while results
+		      (let ((v (pop results)))
+			(format t "~&~:[~S~;~A~]~@[ ;~]"
+				(and (si:*structurep v)
+				     (si:*structure-definition-print-function
+				      (si:*structure-definition v)))
+				v results)))))))))
       ((or error quit) (c)
-	(set-buffer replbuf)
-	(let ((start (point-max)))
-	  (with-output-to-buffer (replbuf start)
-	    (if si:*trace-on-error*
-		(let ((lines (nreverse (split-string (get-output-stream-string estr) #\LFD))))
-		  (format t "~{~A~%~}~A~%~%"
-			  (nreverse (member-if (lambda (l) (string-match "^>CALL STACK +[0-9]+: (eval " l)) lines))
-			  (car lines)))
-	      (format t "~A~%~%" (si:*condition-string c))))
-	  (apply #'set-text-attribute start (point-max)
-		 'error *error-style*))))))
+       (with-print-to-buffer (replbuf :tag 'error :style *error-style*)
+	 (if si:*trace-on-error*
+	     (let ((lines (nreverse (split-string (get-output-stream-string estr) #\LFD))))
+	       (format t "~{~A~%~}~A~%~%"
+		       (nreverse (member-if (lambda (l) (string-match "^>CALL STACK +[0-9]+: (eval " l)) lines))
+		       (car lines)))
+	   (format t "~A~%~%" (si:*condition-string c))))))))
+
 
 (defun newline-or-eval-input ()
   (interactive)
