@@ -14,7 +14,7 @@
 (defun repl.command::load (name)
   "*load-path*‚Édefault-directory‚ðŠÜ‚ß‚Ä(load-library 'name)‚ð•]‰¿"
   (let ((*load-path* (cons (default-directory) *load-path*)))
-    (princ (load-library name))))
+    (princ (load-library (string name)))))
 
 ;; packageŒn
 (defun repl.command::lspkg (&optional pattern)
