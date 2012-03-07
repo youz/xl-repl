@@ -63,7 +63,7 @@
 		     (or (and external (eq stype :external))
 			 (and internal (eq stype :internal)))
 		     (or (null pattern) (string-match (string pattern) (symbol-name sym))))
-	    (push sym syms)))))
+	    (pushnew sym syms)))))
     (sort syms #'string< :key #'symbol-name)))
 
 (defun show-package-description (pkgname)
