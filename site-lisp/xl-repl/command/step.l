@@ -45,15 +45,14 @@
 
 
 (defun repl-step-evalhook (form env)
-  (unless *skip-all*
-    (printf "~&~V@{| ~}Form: ~:[~S~;[byte-code]~]~%" *depth*
-	    (and (consp form) (eq (car form) 'si:*byte-code)) form))
+  (printf "~&~V@{| ~}Form: ~:[~S~;[byte-code]~]~%" *depth*
+	  (and (consp form) (eq (car form) 'si:*byte-code)) form)
   (handler-case
       (let ((values (multiple-value-list
 		     (let ((*depth* (1+ *depth*)))
 		       (evalhook form #'repl-step-evalhook nil env)))))
+	(printf "~&~V@{| ~}+-Values:~{ ~S~}~%" *depth* values)
 	(unless *skip-all*
-	  (printf "~&~V@{| ~}+-Values:~{ ~S~}~%" *depth* values)
 	  (save-excursion
 	    (set-buffer *repl-buffer*)
 	    (case (read-keyinput "[n] next step / [s] skip-all ? " '(#\n #\s) t)
