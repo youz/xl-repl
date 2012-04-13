@@ -138,6 +138,9 @@ REPLバッファ用キーマップ `repl:*keymap*` は、 `ed:*lisp-mode-map*` �
     :require (name)
         ; *load-path*にdefault-directoryを含めて(require 'name)を評価
 
+    :step (form)
+        ; formをステップ実行
+
     :time (form)
         ; formを評価し、実行時間(秒)を表示
 
