@@ -117,6 +117,9 @@ REPLバッファ用キーマップ `repl:*keymap*` は、 `ed:*lisp-mode-map*` �
     :load (name)
         ; *load-path*にdefault-directoryを含めて(load-library 'name)を評価
 
+    :log (form)
+        ;  ログ取り用バッファストリームを*log*にバインドしてformを評価
+
     :ls (&optional pat (pkg *package*))
         ; パッケージ内の変数/定数/関数シンボルを列挙
 

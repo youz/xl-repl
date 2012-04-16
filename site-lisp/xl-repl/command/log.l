@@ -45,8 +45,9 @@
       (ed::make-general-output-stream #'writer))))
 
 
-(defun repl.command::log (expr)
-  (let ((expr (format nil "(let ((*log* (~S))) ~S)" 'make-log-stream expr)))
+(defun repl.command::log (form)
+  "ログ取り用バッファストリームを*log*にバインドしてformを評価"
+  (let ((expr (format nil "(let ((*log* (~S))) ~S)" 'make-log-stream form)))
     (repl::eval-and-print expr t)))
 
 
