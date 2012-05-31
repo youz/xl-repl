@@ -28,8 +28,10 @@
       (get 'whenlet #0#) 2
       (get 'whilet #0#) 2)
 
-(defmacro nth-value (n form)
-  `(nth ,n (multiple-value-list ,form)))
+(unless (fboundp 'nth-value)
+  (export '(nth-value))
+  (defmacro nth-value (n form)
+    `(nth ,n (multiple-value-list ,form))))
 
 (defun read-all-from-string (str)
   (let ((forms nil)
