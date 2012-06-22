@@ -67,6 +67,13 @@
 	    (show-function-description sym nil))
 	(list-symbols nil :pattern pattern)))
 
+(defun repl.command::lscmd (&optional pattern)
+  "コマンド名を列挙"
+  (mapc #'(lambda (sym)
+	    (when (commandp sym)
+	      (show-function-description sym nil)))
+	(list-symbols nil :pattern pattern :internal nil)))
+
 ;; misc
 (defun repl.command::time (form)
   "formを評価し、実行時間(秒)を表示"
