@@ -7,5 +7,6 @@
 (in-package :repl)
 
 (defun repl.command::calc (&rest exprs)
+  "exprs‚ðcalc-mode‚ÌŒvŽZŽ®‚Æ‚µ‚Ä•]‰¿"
   (let ((result (ed::calc-string (format nil "~{~A~^ ~}" exprs))))
     (eval-and-print (format nil "~A" result) t)))
