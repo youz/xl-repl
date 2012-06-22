@@ -4,7 +4,7 @@
   (require "xl-repl/package"))
 
 (in-package :repl.util)
-(export '(iflet whenlet whilet nth-value
+(export '(iflet whenlet whilet defer
 	  read-all-from-string
 	  print-with-attribute
 	  with-print-to-buffer
@@ -24,9 +24,13 @@
 (defmacro whilet (var test &body body)
   `(do ((,var ,test ,test)) ((not ,var) nil) ,@body))
 
+(defmacro defer (&body body)
+  `(start-timer 0 #'(lambda () ,@body (refresh-screen)) t))
+
 (setf (get 'iflet #0='ed:lisp-indent-hook) 1
       (get 'whenlet #0#) 2
-      (get 'whilet #0#) 2)
+      (get 'whilet #0#) 2
+      (get 'defer #0#) 0)
 
 (unless (fboundp 'nth-value)
   (export '(nth-value))
