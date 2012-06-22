@@ -7,6 +7,8 @@
 (require "xl-repl/command/reference")
 (require "xl-repl/command/log")
 (require "xl-repl/command/step")
+
 (require "xl-repl/command/calc")
+(require "xl-repl/command/clip")
 
 (provide "xl-repl/command")
