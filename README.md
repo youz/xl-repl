@@ -99,8 +99,14 @@ REPLバッファ用キーマップ `repl:*keymap*` は、 `ed:*lisp-mode-map*` �
 
 以下のキーワードシンボル(と引数)を入力するとREPLコマンドを実行します。
 
+    :calc (&rest exprs)
+        ; exprsをcalc-modeの計算式として評価
+
     :cd (&optional dir)
         ; default-directoryをdirへ移動 (dir省略時はdefault-directoryを表示)
+
+    :clip (form)
+        ; formを評価し、*standard-output*への出力をクリップボードへコピー
 
     :describe (symbol-or-package-name)
         ; パッケージ/変数/定数/関数の説明を表示
@@ -118,13 +124,16 @@ REPLバッファ用キーマップ `repl:*keymap*` は、 `ed:*lisp-mode-map*` �
         ; *load-path*にdefault-directoryを含めて(load-library 'name)を評価
 
     :log (form)
-        ;  ログ取り用バッファストリームを*log*にバインドしてformを評価
+        ; ログ取り用バッファストリームをレキシカル変数*log*に束縛してformを評価
 
     :ls (&optional pat (pkg *package*))
         ; パッケージ内の変数/定数/関数シンボルを列挙
 
     :lsall (&optional pattern)
         ; 全パッケージの変数/定数/関数シンボルを列挙
+
+    :lscmd (&optional pattern)
+        ; コマンド名を列挙
 
     :lsext (&optional pattern (pkg *package*))
         ; パッケージよりexportされている変数/定数/関数シンボルを列挙
@@ -137,6 +146,13 @@ REPLバッファ用キーマップ `repl:*keymap*` は、 `ed:*lisp-mode-map*` �
 
     :package (name)
         ; (in-package 'name)を評価
+
+    :reference (word &rest options)
+        ; リファレンスを表示
+        ; [オプション]
+        ; :part - 部分一致検索
+        ; :regexp - 正規表現検索
+        ; :fts  - 本文を含めた全文検索
 
     :require (name)
         ; *load-path*にdefault-directoryを含めて(require 'name)を評価

@@ -1,6 +1,44 @@
 # xl-repl 変更履歴
 
 
+## 2012/06/22  v1.2.0
+
+### 修正点
+
+* Ctrl+Gで評価を中断した時に次のプロンプトが表示されない問題を修正
+* ls系コマンドでシンボルが重複して表示される場合がある問題を修正
+
+### 新機能 (REPLコマンド)
+
+* reference (word &rest options)
+    + ~/reference 以下にあるxmlファイルを全てロードし、
+      タイトルが引数wordと合致するchapterを検索して表示します。
+    + optionとして:part (部分一致), :regexp (正規表現検索),
+      :fts (本文含む全文検索)を指定できます。
+    + (例)
+    + :ref -file :part
+        - タイトルに "-file" を含むchapterを表示
+    + :ref "^string-" :regexp
+        - タイトルが "string-" で始まるchapterを表示
+    + :ref condition :fts
+        - タイトルもしくは本文に "condition" が含まれるchapterを表示
+* lscmd (&optional pattern)
+    + コマンド (interactive宣言された関数) を列挙します。
+* step (form)
+    + formをステップ実行します。
+    + ステップ実行中はminibufferにプロンプトが表示され、
+      nキーで1ステップ実行、sキーで残りのステップを全て実行します。
+* log (form)
+    + `*log*` という名前のバッファに出力するストリームを
+      レキシカル変数`*log*`に束縛した中でformを評価します。
+      hook関数やstart-timer等を使用した非同期処理でprintfデバッグを
+      する時に便利です。
+* calc (&rest exprs)
+    + exprsをcalc-modeの計算式として評価します。
+* clip (form)
+    + formを評価し、`*standard-output*` への出力をクリップボードにコピーします。
+
+
 ## 2012/02/25  v1.1.0
 
 ### 新機能
