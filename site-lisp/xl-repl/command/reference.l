@@ -142,7 +142,7 @@
 
 ;;; repl command
 (defun repl.command::reference (word &rest options)
-  "リファレンスを検索して表示します。
+  "リファレンスを表示
     ; [オプション]
     ; :part - 部分一致検索
     ; :regexp - 正規表現検索

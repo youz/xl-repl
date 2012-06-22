@@ -46,7 +46,7 @@
 
 
 (defun repl.command::log (form)
-  "ログ取り用バッファストリームを*log*にバインドしてformを評価"
+  "ログ取り用バッファストリームをレキシカル変数*log*に束縛してformを評価"
   (let ((expr (format nil "(let ((*log* (~S))) ~S)" 'make-log-stream form)))
     (repl::eval-and-print expr t)))
 
