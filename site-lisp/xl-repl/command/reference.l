@@ -1,6 +1,7 @@
 ;;; -*- mode:lisp; package:repl.command.reference -*-
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
+  (require "ole")
   (require "xl-repl/repl-mode"))
 
 (defpackage :repl.command.reference
