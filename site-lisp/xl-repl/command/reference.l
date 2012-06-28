@@ -13,7 +13,8 @@
 	  index
 	  lookup
 	  lookup-regexp
-	  full-text-search))
+	  full-text-search
+	  *reference-mode-map*))
 
 (defvar *reference-directory* "~/reference")
 (defvar *reference* nil)
@@ -149,10 +150,83 @@
 	(mapc #'a (lookup title))))))
 
 (defun full-text-search (word)
+  "‘S•¶ŒŸõ"
   (load-all-references)
   (let ((xpath (format nil "/book/chapter[contains(., '~A')]" word)))
     (mapcar #'cdr (find-nodes *reference* xpath))))
 
+
+;;; reference mode
+(defvar *reference-mode-map* nil)
+(defvar *reference-history* nil)
+(defvar *reference-history-index* nil)
+(unless *reference-mode-map*
+  (setq *reference-mode-map* (make-sparse-keymap))
+  (define-key *reference-mode-map* #\j 'next-line)
+  (define-key *reference-mode-map* #\k 'previous-line)
+  (define-key *reference-mode-map* #\J 'next-chapter)
+  (define-key *reference-mode-map* #\K 'previous-chapter)
+  (define-key *reference-mode-map* #\RET 'jump)
+  (define-key *reference-mode-map* #\C-h 'backward-history)
+  (define-key *reference-mode-map* #\M-Left 'backward-history)
+  (define-key *reference-mode-map* #\M-Right 'forward-history))
+
+
+(defun next-chapter ()
+  (interactive)
+  (when (scan-buffer "^=+$" :regexp t :no-dup t)
+    (recenter 0)))
+
+(defun previous-chapter ()
+  (interactive)
+  (when (scan-buffer "^=+$" :regexp t :no-dup t :reverse t)
+    (recenter 0)))
+
+(defun add-reference-history (word)
+  (cond ((null *reference-history*)
+	 (setq *reference-history* (list word)
+	       *reference-history-index* 0))
+	((string/= word (nth *reference-history-index* *reference-history*))
+	 (setq *reference-history* (cons word (nthcdr *reference-history-index* *reference-history*))
+	       *reference-history-index* 0))))
+
+(defun forward-history ()
+  (interactive)
+  (when (> *reference-history-index* 0)
+    (repl.command::reference (nth (decf *reference-history-index*) *reference-history*))))
+
+(defun backward-history ()
+  (interactive)
+  (when (< *reference-history-index* (1- (length *reference-history*)))
+    (repl.command::reference (nth (incf *reference-history-index*) *reference-history*))))
+
+(defun jump ()
+  (interactive)
+  (multiple-value-bind (from to tag) (find-text-attribute-point (point))
+    (if tag
+	(repl.command::reference (cadr tag))
+      (whenlet word (find (ed::get-winhelp-topic) *title-index* :test #'string-equal)
+	(repl.command::reference word)))))
+
+(defun print-reference (buf refs)
+  (save-excursion
+    (set-buffer buf)
+    (setq buffer-read-only nil)
+    (erase-buffer buf)
+    (with-output-to-buffer (buf)
+      (dolist (ref refs)
+	(format t "~50@{=~}~%" t)
+	(dolist (k '(:title :package :file :section))
+	  (format t "~{~10A:~^ ~A~}~%" (assoc k ref)))
+	(format t "~50@{-~}~A" (cadr (assoc :description ref)))
+	(whenlet seealso (mapcar #'cadr (remove :seealso ref :test-not 'eq :key #'car))
+	  (dolist (w seealso)
+	    (format t "~%seealso: ~A" w)
+	    (let ((p (point-max)))
+	      (save-excursion
+		(set-buffer buf)
+		(set-text-attribute (- p (length w)) p `(:seealso ,w) :foreground 4)))))
+	(princ "\n\n")))))
 
 ;;; repl command
 (defun repl.command::reference (word &rest options)
@@ -171,17 +245,12 @@
 		    (t (lookup word)))))
     (unless refs
       (error "Œ©‚Â‚©‚è‚Ü‚¹‚ñ : ~S" word))
+    (add-reference-history word)
     (defer
       (let ((buf (get-buffer-create "*reference*"))
 	    (wc (current-window-configuration))
-	    (km (make-keymap)))
-	(erase-buffer buf)
-	(with-output-to-buffer (buf)
-	  (dolist (ref refs)
-	    (format t "~50@{=~}~%" t)
-	    (dolist (k '(:title :package :file :section))
-	      (format t "~{~10A:~^ ~A~}~%" (assoc k ref)))
-	    (format t "~50@{-~}~A~%~%" (cadr (assoc :description ref)))))
+	    (km (copy-keymap *reference-mode-map*)))
+	(print-reference buf refs)
 	(flet ((quit-refe ()
 		 (interactive)
 		 (delete-buffer buf)
@@ -189,6 +258,7 @@
 	  (define-key km #\q #'quit-refe)
 	  (pop-to-buffer buf t t)
 	  (kill-all-local-variables)
+	  (setq need-not-save t buffer-read-only t)
 	  (make-local-variable 'keyword-hash-table)
 	  (setq keyword-hash-table (or ed::*lisp-keyword-hash-table*
 				       (load-keyword-file "lisp")))
