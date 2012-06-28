@@ -74,7 +74,7 @@
     (t nil)))
 
 
-;;; load all reference files
+;;; load xml files
 (defun load-all-references (&optional reload)
   "*reference-directory*下の全てのxmlファイルをロードし、全chapterを
 統合して*reference*に、chapter titleのリストを*title-index*に格納"
@@ -172,7 +172,6 @@
   (define-key *reference-mode-map* #\M-Right 'forward-history)
   (define-key *reference-mode-map* #\LBtnDown 'mouse-left-click))
 
-
 (defun next-chapter ()
   (interactive)
   (when (scan-buffer "^=+$" :regexp t :no-dup t)
@@ -224,20 +223,21 @@
     (erase-buffer buf)
     (with-output-to-buffer (buf)
       (dolist (ref refs)
-	(format t "~50@{=~}~%" t)
-	(dolist (k '(:title :type :arguments :package :file :section))
+	(format t "~V@{=~}~%  ~A~%" (min 60 (window-columns))
+		(cadr (assoc :title ref)))
+	(dolist (k '(:type :arguments :package :file :section))
 	  (whenlet v (assoc k ref)
 	    (format t "~{~10A:~^ ~A~}~%" v)))
-	(format t "~50@{-~}~A" (cadr (assoc :description ref)))
+	(format t "~V@{-~}~A" (min 60 (window-columns))
+		(cadr (assoc :description ref)))
 	(whenlet seealso
 	    (remove-if #'null (mapcar #'cadr (remove :seealso ref :test-not 'eq :key 'car)))
 	  (dolist (w seealso)
 	    (format t "~%seealso: ~A" w)
 	    (let ((p (point-max)))
-	      (save-excursion
-		(set-buffer buf)
-		(set-text-attribute (- p (length w)) p `(:seealso ,w) :foreground 4)))))
+	      (set-text-attribute (- p (length w)) p `(:seealso ,w) :foreground 4))))
 	(princ "\n\n")))))
+
 
 ;;; repl command
 (defun repl.command::reference (word &rest options)
