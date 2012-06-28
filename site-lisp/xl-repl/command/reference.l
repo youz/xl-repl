@@ -183,23 +183,26 @@
   (when (scan-buffer "^=+$" :regexp t :no-dup t :reverse t)
     (recenter 0)))
 
-(defun add-reference-history (word)
-  (cond ((null *reference-history*)
-	 (setq *reference-history* (list word)
-	       *reference-history-index* 0))
-	((string/= word (nth *reference-history-index* *reference-history*))
-	 (setq *reference-history* (cons word (nthcdr *reference-history-index* *reference-history*))
-	       *reference-history-index* 0))))
+(defun add-reference-history (word options)
+  (let ((page (cons word options)))
+    (cond ((null *reference-history*)
+	   (setq *reference-history* (list page)
+		 *reference-history-index* 0))
+	  ((not (equal page (nth *reference-history-index* *reference-history*)))
+	   (setq *reference-history* (cons page (nthcdr *reference-history-index* *reference-history*))
+		 *reference-history-index* 0)))))
 
 (defun forward-history ()
   (interactive)
   (when (> *reference-history-index* 0)
-    (repl.command::reference (nth (decf *reference-history-index*) *reference-history*))))
+    (apply #'repl.command::reference
+	   (nth (decf *reference-history-index*) *reference-history*))))
 
 (defun backward-history ()
   (interactive)
   (when (< *reference-history-index* (1- (length *reference-history*)))
-    (repl.command::reference (nth (incf *reference-history-index*) *reference-history*))))
+    (apply #'repl.command::reference
+	   (nth (incf *reference-history-index*) *reference-history*))))
 
 (defun mouse-left-click ()
   (interactive)
@@ -251,7 +254,7 @@
 		    (t (lookup word)))))
     (unless refs
       (error "Œ©‚Â‚©‚è‚Ü‚¹‚ñ : ~S" word))
-    (add-reference-history word)
+    (add-reference-history word options)
     (defer
       (let ((buf (get-buffer-create "*reference*"))
 	    (wc (current-window-configuration))
