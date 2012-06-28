@@ -229,7 +229,8 @@
 	  (whenlet v (assoc k ref)
 	    (format t "~{~10A:~^ ~A~}~%" v)))
 	(format t "~50@{-~}~A" (cadr (assoc :description ref)))
-	(whenlet seealso (mapcar #'cadr (remove :seealso ref :test-not 'eq :key #'car))
+	(whenlet seealso
+	    (remove-if #'null (mapcar #'cadr (remove :seealso ref :test-not 'eq :key 'car)))
 	  (dolist (w seealso)
 	    (format t "~%seealso: ~A" w)
 	    (let ((p (point-max)))
