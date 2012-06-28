@@ -30,6 +30,7 @@
     (reduce #'mkform chain :initial-value oleobj)))
 
 (defun mapcol (func col)
+  "OLEのCollectionの全要素に対してfuncを適用し、結果をリストにして返す"
   (let ((result nil))
     (ole-for-each (e col)
       (push (funcall func e) result))
@@ -37,12 +38,14 @@
 
 ;;; msxml
 (defun create-ole-xmldoc ()
+  "空のDOMDocumentオブジェクトを生成する"
   (let ((xmldom (ole-create-object +msxml-domdoc-progid+)))
     (setf ($ xmldom validateOnParse) nil)
     ($ xmldom (setProperty "ProhibitDTD" nil))
     xmldom))
 
 (defun load-xml (path)
+  "DOMDocumentオブジェクトを生成し、指定したxmlファイルを読み込む"
   (let ((doc (create-ole-xmldoc)))
     (if ($ doc (load path))
 	doc
@@ -52,12 +55,15 @@
 	       ($ perr srcText) ($ perr reason))))))
 
 (defun find-nodes (dom xpath)
+  "DOMオブジェクト中のXPathに適合する全ノードをlispデータにして返す"
   (delete #'null (mapcol #'dom->sexp ($ dom (selectNodes xpath)))))
 
 (defun find-1node (dom xpath)
+  "DOMオブジェクト中のXPathに適合する最初のノードをlispデータに変換して返す"
   (dom->sexp ($ dom (selectSingleNode xpath))))
 
 (defun dom->sexp (dom)
+  "DOMオブジェクトをlispデータ(木構造リスト)に変換 (参考: xhr::dom->sexp)"
   (case ($ dom NodeType)
     (1 (cons (intern ($ dom NodeName) "keyword")
 	     (delete #'null (mapcol #'dom->sexp ($ dom ChildNodes)))))
@@ -69,6 +75,8 @@
 
 ;;; load all reference files
 (defun load-all-references (&optional reload)
+  "*reference-directory*下の全てのxmlファイルをロードし、全chapterを
+統合して*reference*に、chapter titleのリストを*title-index*に格納"
   (when (and *reference* (typep *reference* 'oledata) (not reload))
     (return-from load-all-references))
   (let ((files (directory *reference-directory* :absolute t :wild "*.xml" :recursive t))
@@ -89,6 +97,8 @@
     t))
 
 (defun load-reference (xmlfile &aux (name (pathname-name xmlfile)))
+  "xyzzyリファレンス形式のXMLファイルをロードして全てのchapterノードを
+*reference*に、chapter titleを*title-index*に追加する"
   (when (find name *loaded-references* :test #'string=)
     (return-from load-reference))
   (unless (file-exist-p xmlfile)
@@ -113,6 +123,7 @@
 
 ;;; exports
 (defun find-chapter (&key title package section file type partial-match)
+  "指定条件からXPathを生成して*reference*より検索"
   (let ((xpath (format nil "/book/chapter~@?"
 		       (if partial-match
 			   "~{[contains(~A, '~A')]~}"
@@ -125,10 +136,12 @@
     (mapcar #'cdr (find-nodes *reference* xpath))))
 
 (defun lookup (title &key partial-match)
+  "chapter titleの完全一致/部分一致検索"
   (load-all-references)
   (find-chapter :title title :partial-match partial-match))
 
 (defun lookup-regexp (regexp)
+  "chapter titleの正規表現"
   (load-all-references)
   (accum a
     (dolist (title *title-index*)
