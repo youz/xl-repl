@@ -169,7 +169,8 @@
   (define-key *reference-mode-map* #\RET 'jump)
   (define-key *reference-mode-map* #\C-h 'backward-history)
   (define-key *reference-mode-map* #\M-Left 'backward-history)
-  (define-key *reference-mode-map* #\M-Right 'forward-history))
+  (define-key *reference-mode-map* #\M-Right 'forward-history)
+  (define-key *reference-mode-map* #\LBtnDown 'mouse-left-click))
 
 
 (defun next-chapter ()
@@ -199,6 +200,11 @@
   (interactive)
   (when (< *reference-history-index* (1- (length *reference-history*)))
     (repl.command::reference (nth (incf *reference-history-index*) *reference-history*))))
+
+(defun mouse-left-click ()
+  (interactive)
+  (goto-last-mouse-point)
+  (jump))
 
 (defun jump ()
   (interactive)
