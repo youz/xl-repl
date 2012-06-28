@@ -174,6 +174,17 @@ REPLバッファ用キーマップ `repl:*keymap*` は、 `ed:*lisp-mode-map*` �
         ; (in-package 'name)を評価
 
 
+### Referenceバッファ 操作方法
+
+referenceコマンドで表示されるバッファ上では以下のキーが使用できます。
+
+- j, k -- 1行移動
+- J, K -- 記事移動 (:part or :ftsオプションを使用して複数記事表示時)
+- q -- referenceバッファを閉じる
+- RET, 左クリック -- (マウス)カーソル下のシンボルやseealso項目の記事にジャンプ
+- Backspace, Alt+Left -- ジャンプ履歴 戻る
+- Alt+Right -- ジャンプ履歴 進む
+
 ## Author
 Yousuke Ushiki (<citrus.yubeshi@gmail.com>)
 
