@@ -9,7 +9,7 @@ lisp-repl-mode for [xyzzy](http://www.jsdlab.co.jp/~kamei/)
  
     下記のURLのパッケージリストを登録し、パッケージ`*scrap*`よりインストールして下さい。
 
-    http://youz.github.com/xyzzy/package.l
+    http://youz.github.io/xyzzy/packages.l
 
 - 手動インストール
 
