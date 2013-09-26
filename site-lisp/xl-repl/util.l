@@ -12,6 +12,7 @@
 	  show-package-description
 	  show-function-description
 	  show-variable-description
+	  package-minimum-name
 	  prettify-region))
 
 
@@ -130,6 +131,8 @@
 	      (when detail type) (package-name pkg) external? name
 	      (when detail doc)))))
 
+(defun package-minimum-name (pkgname)
+  (car (sort (cons pkgname (package-nicknames pkgname)) #'< :key #'length)))
 
 (defun indent-hook (sym)
   (when (symbolp sym)

@@ -63,7 +63,8 @@
 	     (let ((post (read-char is nil nil)))
 	       (if (null post) c
 		 (case (char-downcase post)
-		   (#\p *buffer-package*)
+		   (#\P *buffer-package*)
+		   (#\p (package-minimum-name *buffer-package*))
 		   (#\d (default-directory))
 		   (#\u (user-name))
 		   (#\m (machine-name))
