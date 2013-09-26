@@ -154,12 +154,13 @@
 
 (defun get-input ()
   (multiple-value-bind (from to) (previous-prompt-point)
-    (iflet np (next-prompt-point)
-      (let ((p (find-text-attribute-if
-		(lambda (tag) (find tag '(stdout cmdout values error)))
-		:start to :end np)))
-	(buffer-substring to (1- (or p np))))
-      (buffer-substring to (point-max)))))
+    (when to
+      (iflet np (next-prompt-point)
+	(let ((p (find-text-attribute-if
+		  (lambda (tag) (find tag '(stdout cmdout values error)))
+		  :start to :end np)))
+	  (buffer-substring to (1- (or p np))))
+	(buffer-substring to (point-max))))))
 
 (defun copy-to-last-input (str &optional append)
   (goto-char (point-max))
@@ -254,7 +255,7 @@
 	   (let ((val (buffer-substring (point) (progn (forward-sexp) (point)))))
 	     (copy-to-last-input val t)))
 	  ((null tag)
-	   (whenlet input (get-input)
+	   (iflet input (get-input)
 	     (cond ((next-prompt-point)
 		    (copy-to-last-input input t))
 		   ((input-complete-p)
@@ -265,7 +266,8 @@
 		      (if (eq buf (selected-buffer))
 			  #1=(show-prompt)
 			(save-excursion (set-buffer buf) #1#))))
-		   (t (lisp-newline-and-indent))))))))
+		   (t (lisp-newline-and-indent)))
+	     (clear-repl))))))
 
 ;;; input history
 (defun save-input-history (input)
