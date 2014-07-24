@@ -3,7 +3,7 @@
 lisp-repl-mode for [xyzzy](http://www.jsdlab.co.jp/~kamei/)
 
 
-## Install
+## インストール
 
 - NetInstallerをよりインストール
  
@@ -28,12 +28,12 @@ lisp-repl-mode for [xyzzy](http://www.jsdlab.co.jp/~kamei/)
         (push 'ed:lisp-repl-mode ed::*ac-mode-lisp-mode*)
 
 
-## Usage
+## 起動
 
     M-x start-repl
 
 
-## Keymap
+## キーマップ
 
 REPLバッファ用キーマップ `repl:*keymap*` は、 `ed:*lisp-mode-map*` をベースにして
 以下のキーバインドを追加/上書きしています。
@@ -53,9 +53,9 @@ REPLバッファ用キーマップ `repl:*keymap*` は、 `ed:*lisp-mode-map*` �
 - M-n -- repl::next-input  (入力履歴 - 進む)
 - M-p -- repl::previous-input  (入力履歴 - 戻る)
 
-## Costomize
+## カスタマイズ
 
-カスタマイズ用変数について。
+各種カスタマイズ用変数について。
 
 - `repl:*buffer-name*`
 
@@ -95,7 +95,7 @@ REPLバッファ用キーマップ `repl:*keymap*` は、 `ed:*lisp-mode-map*` �
           repl:*return-behavior* :send-only-if-after-complete)
 
 
-## REPL Command
+## REPLコマンド
 
 以下のキーワードシンボル(と引数)を入力するとREPLコマンドを実行します。
 
